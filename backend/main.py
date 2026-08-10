@@ -5,5 +5,7 @@ budget      = 1500
 travel_style = "Family"
 
 # Reuse them anywhere
-print(destination)    # -> Japan
-print(days)           # -> 5
+print(f"Destination : {destination} - {days} days - {budget} USD - {travel_style} Style")
+print(f"Days        : {days}")
+print(f"Budget      : {budget}")
+print(f"Style       : {travel_style}")

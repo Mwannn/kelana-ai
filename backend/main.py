@@ -1,54 +1,44 @@
-def calculate_daily_budget(budget, days):
-    return budget / days
+from services.trip_service import (
+    get_trip_category, 
+    get_travel_session, 
+    calculate_daily_budget, 
+    get_recommended_places
+)
 
-def get_trip_category(budget):
-    if budget < 1000:
-        return "Backpacker"
-    elif budget <= 3000:
-        return "Standard"
-    else:
-        return "Luxury"
+def main():
+    print("==================================")
+    print("KelanaAI - Input")
+    print("==================================")
+    # Tangani I/O
+    destination = input("Destination (default: Japan): ") or "Japan"
+    
+    days_input = input("Days (default: 5): ")
+    days = int(days_input) if days_input.strip() else 5
+    
+    budget_input = input("Budget USD (default: 1500): ")
+    budget = float(budget_input) if budget_input.strip() else 1500.0
+    
+    month = input("Travel Month (default: December): ") or "December"
 
-# Now use them
-def print_trip_summary(
-    destination,
-    days,
-    budget,
-    travel_style,
-    hotel_cost,
-    food_cost,
-    transportation_cost,
-    miscellaneous_cost
-):
-    total_estimated_cost = (
-        hotel_cost
-        + food_cost
-        + transportation_cost
-        + miscellaneous_cost
-    )
+    category = get_trip_category(budget)
+    daily_budget = calculate_daily_budget(budget, days)
+    season = get_travel_session(month)
+    recommended_places = get_recommended_places(destination)
 
-    print("=======================")
+    print("\n==================================")
     print("KelanaAI")
-    print("=======================")
-    print(f"Destination : {destination}")
+    print("==================================")
+    print(f"Destination     : {destination.capitalize()}")
     print(f"Days        : {days}")
-    print(f"Budget      : {budget}")
-    print(f"Style       : {travel_style}")
-    print(f"Hotel Cost  : {hotel_cost}")
-    print(f"Food Cost   : {food_cost}")
-    print(f"Transport   : {transportation_cost}")
-    print(f"Misc Cost   : {miscellaneous_cost}")
-    print(f"Total Cost  : {total_estimated_cost}")
+    print(f"Budget       : {int(budget) if budget.is_integer() else budget} USD")
+    print(f"Category      : {category}")
+    print(f"Daily Budget    : {int(daily_budget) if daily_budget.is_integer() else daily_budget} USD/Day")
+    print(f"Travel Month: {month.capitalize()}")
+    print(f"Season : {season}\n")
 
-    if total_estimated_cost > budget:
-        print("⚠️ Budget exceeded.")
+    print("Recommended Places")
+    for place in recommended_places:
+        print(f"- {place}")
 
-    print()
-
-# Call it with any trip
-print_trip_summary("Japan", 5, 1500, "Family", 900, 300, 250, 100)
-print_trip_summary("Bali", 3, 800, "Backpacker", 300, 150, 100, 75)
-
-daily = calculate_daily_budget(1500, 5)
-category = get_trip_category(1500)
-print(f"{category} - {daily} USD/day")
+if __name__ == "__main__":
+    main()

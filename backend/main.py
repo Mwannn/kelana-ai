@@ -1,3 +1,14 @@
+def calculate_daily_budget(budget, days):
+    return budget / days
+
+def get_trip_category(budget):
+    if budget < 1000:
+        return "Backpacker"
+    elif budget <= 3000:
+        return "Standard"
+    else:
+        return "Luxury"
+
 # Now use them
 def print_trip_summary(
     destination,
@@ -37,3 +48,7 @@ def print_trip_summary(
 # Call it with any trip
 print_trip_summary("Japan", 5, 1500, "Family", 900, 300, 250, 100)
 print_trip_summary("Bali", 3, 800, "Backpacker", 300, 150, 100, 75)
+
+daily = calculate_daily_budget(1500, 5)
+category = get_trip_category(1500)
+print(f"{category} - {daily} USD/day")

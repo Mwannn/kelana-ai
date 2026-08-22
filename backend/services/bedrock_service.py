@@ -27,6 +27,11 @@ def generate_itinerary(destination: str, days: int, budget: float, travel_style:
     - Travel tips section
     - Local food recommendations
     - Estimated budget breakdown
+
+    For each daily itinerary, you must strictly follow these requirements:
+    - Morning activities: Provide exactly 2-3 specific morning activities.
+    - Afternoon activities: Include recommendations for cultural sites and local experiences.
+    - Evening activities: Suggest specific dinner spots and nightlife entertainment.
     
     Format your response as Markdown with headers (##) and bullet lists (-).
     """

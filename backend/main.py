@@ -39,13 +39,14 @@ def health_check():
 def create_trip(trip_request: TripCreate, db: Session = Depends(get_db)):
     # reuse Session 2 business logic
     daily_budget = calculate_daily_budget(trip_request.budget, trip_request.days)
-    category = get_trip_category(trip_request.budget)
+    category = get_trip_category(trip_request.budget, trip_request.currency)
     
     # create a Trip ORM object
     trip = Trip(
         destination=trip_request.destination,
         days=trip_request.days,
         budget=trip_request.budget,
+        currency=trip_request.currency,
         category=category,
         daily_budget=daily_budget,
     )
@@ -77,12 +78,13 @@ def update_trip(trip_id: int, trip_update: TripCreate, db: Session = Depends(get
         
     # Recalculate
     daily_budget = calculate_daily_budget(trip_update.budget, trip_update.days)
-    category = get_trip_category(trip_update.budget)
+    category = get_trip_category(trip_update.budget, trip_update.currency)
     
     # Update fields
     trip.destination = trip_update.destination
     trip.days = trip_update.days
     trip.budget = trip_update.budget
+    trip.currency = trip_update.currency
     trip.category = category
     trip.daily_budget = daily_budget
     
@@ -118,7 +120,8 @@ def generate_trip_recommendation(trip_id: int, req: TripGenerateRequest, db: Ses
         days=trip.days,
         budget=trip.budget,
         travel_style=req.travel_style,
-        language=req.language
+        language=req.language,
+        currency=trip.currency
     )
     
     # Save Recommendation

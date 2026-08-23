@@ -6,6 +6,7 @@ class TripBase(BaseModel):
     destination: str
     days: int
     budget: float
+    currency: str = "USD"
     # Optional field if user passes it from frontend for AI generation
     travel_style: Optional[str] = "Standard"
 

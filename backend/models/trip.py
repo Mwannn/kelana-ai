@@ -9,6 +9,7 @@ class Trip(Base):
     destination = Column(String, nullable=False)
     days = Column(Integer, nullable=False)
     budget = Column(Float, nullable=False)
+    currency = Column(String, nullable=False, default="USD")
     category = Column(String, nullable=False)
     daily_budget = Column(Float, nullable=False)
     

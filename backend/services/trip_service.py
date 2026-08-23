@@ -1,4 +1,8 @@
-def get_trip_category(budget):
+def get_trip_category(budget, currency="USD"):
+    # Convert IDR to approximate USD for categorization purposes
+    if currency == "IDR":
+        budget = budget / 15000.0
+
     if budget < 1000:
         return "Backpacker"
     elif budget <= 3000:

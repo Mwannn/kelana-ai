@@ -7,6 +7,7 @@ import * as THREE from 'three';
 export default function Home() {
   const [destination, setDestination] = useState('Japan');
   const [budget, setBudget] = useState('9000');
+  const [currency, setCurrency] = useState('IDR');
   const [days, setDays] = useState('7');
   const [travelStyle, setTravelStyle] = useState('Luxury');
   const [language, setLanguage] = useState('Indonesian');
@@ -184,7 +185,8 @@ export default function Home() {
         body: JSON.stringify({
           destination,
           budget: parseFloat(budget),
-          days: parseInt(days),
+          currency,
+          days: parseInt(days, 10),
           travel_style: travelStyle,
         }),
       });
@@ -317,10 +319,24 @@ export default function Home() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs uppercase tracking-wider text-[#7B8395] mb-2 font-medium">Budget (USD)</label>
-                      <div className="input-wrap relative">
-                        <i className="input-icon fa-solid fa-dollar-sign"></i>
-                        <input type="number" value={budget} onChange={e => setBudget(e.target.value)} required className="input-field" placeholder="0" />
+                      <label className="block text-xs uppercase tracking-wider text-[#7B8395] mb-2 font-medium">Budget</label>
+                      <div className="flex bg-[#08111C]/50 border border-[rgba(255,255,255,0.05)] rounded-xl focus-within:border-[#FF6B4A]/50 transition-colors">
+                        <select 
+                          value={currency} 
+                          onChange={e => setCurrency(e.target.value)} 
+                          className="bg-transparent text-white px-4 outline-none border-r border-[rgba(255,255,255,0.05)] text-sm appearance-none cursor-pointer"
+                        >
+                          <option value="IDR" className="bg-[#0F1B2D]">IDR</option>
+                          <option value="USD" className="bg-[#0F1B2D]">USD</option>
+                        </select>
+                        <input 
+                          type="number" 
+                          value={budget} 
+                          onChange={e => setBudget(e.target.value)} 
+                          required 
+                          className="flex-1 bg-transparent text-white px-4 py-3.5 outline-none placeholder-[#7B8395] text-sm" 
+                          placeholder="0" 
+                        />
                       </div>
                     </div>
                     <div>
@@ -452,7 +468,7 @@ export default function Home() {
                     <div className="flex gap-2 flex-wrap">
                       <span className="px-3 py-1.5 rounded-full bg-[rgba(255,107,74,0.2)] border border-[rgba(255,107,74,0.4)] text-xs text-[#FF8A5C]"><i className="fa-solid fa-crown mr-1.5"></i> {tripData.category}</span>
                       <span className="px-3 py-1.5 rounded-full bg-[rgba(74,219,200,0.15)] border border-[rgba(74,219,200,0.35)] text-xs text-[#4ADBC8]"><i className="fa-solid fa-calendar mr-1.5"></i> {tripData.days} Days</span>
-                      <span className="px-3 py-1.5 rounded-full bg-[rgba(255,184,69,0.15)] border border-[rgba(255,184,69,0.35)] text-xs text-[#FFB845]"><i className="fa-solid fa-dollar-sign mr-1.5"></i> ${tripData.budget}</span>
+                      <span className="px-3 py-1.5 rounded-full bg-[rgba(255,184,69,0.15)] border border-[rgba(255,184,69,0.35)] text-xs text-[#FFB845]"><i className={`fa-solid ${tripData.currency === 'IDR' ? 'fa-money-bill' : 'fa-dollar-sign'} mr-1.5`}></i> {tripData.currency === 'IDR' ? 'Rp' : '$'} {Number(tripData.budget).toLocaleString('id-ID')}</span>
                     </div>
                   </div>
                 </div>

@@ -12,14 +12,14 @@ client = boto3.client(
     region_name=os.getenv("AWS_REGION", "ap-southeast-2")
 )
 
-def generate_itinerary(destination: str, days: int, budget: float, travel_style: str, language: str = "English") -> str:
+def generate_itinerary(destination: str, days: int, budget: float, travel_style: str, language: str = "English", currency: str = "USD") -> str:
     """Generate an AI itinerary using Amazon Bedrock Converse API."""
     
     # Session 5 & 6: Enhance prompt for richer AI output & Markdown format
     prompt = f"""
     You are an elite, highly experienced local travel expert and concierge.
     I need a highly detailed, extremely accurate, and realistic {days}-day itinerary for {destination}.
-    My Budget: USD {budget} (please ensure recommendations align with this budget)
+    My Budget: {currency} {budget} (please ensure recommendations align with this budget)
     My Travel Style: {travel_style}
     
     CRITICAL INSTRUCTION 1: You MUST write your entire response in the {language} language.
@@ -43,7 +43,7 @@ def generate_itinerary(destination: str, days: int, budget: float, travel_style:
        - Best ways to get around (public transit, apps, etc.)
        - Safety tips and tourist traps to avoid
        
-    5. 💰 **Budget Breakdown**: A realistic breakdown of the USD {budget} covering Food, Transport, and Activities.
+    5. 💰 **Budget Breakdown**: A realistic breakdown of the {currency} {budget} covering Food, Transport, and Activities.
     
     Tone: Professional, highly descriptive, inspiring, and incredibly knowledgeable. Use Markdown headers (##, ###), bold text for emphasis, and emojis to make it engaging and easy to read.
     """

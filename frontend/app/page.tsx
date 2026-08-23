@@ -9,6 +9,7 @@ export default function Home() {
   const [budget, setBudget] = useState('9000');
   const [days, setDays] = useState('7');
   const [travelStyle, setTravelStyle] = useState('Luxury');
+  const [language, setLanguage] = useState('Indonesian');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tripData, setTripData] = useState<any>(null);
@@ -194,7 +195,7 @@ export default function Home() {
       const genRes = await fetch(`http://localhost:8000/api/v1/trips/${trip.id}/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ travel_style: travelStyle }),
+        body: JSON.stringify({ travel_style: travelStyle, language }),
       });
 
       if (!genRes.ok) throw new Error('Failed to generate AI recommendation');
@@ -347,6 +348,22 @@ export default function Home() {
                     </div>
                   </div>
 
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-[#7B8395] mb-2 font-medium">Language</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['English', 'Indonesian'].map(lang => (
+                        <button 
+                          key={lang}
+                          type="button" 
+                          onClick={() => setLanguage(lang)}
+                          className={`style-pill ${language === lang ? 'active' : ''}`}
+                        >
+                          {lang}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {error && <div className="text-red-400 text-sm">{error}</div>}
 
                   <button type="submit" disabled={loading} className="btn-primary w-full flex items-center justify-center gap-2.5 mt-2">
@@ -418,10 +435,13 @@ export default function Home() {
 
               {/* Hero Banner with Dynamic Data */}
               <div className="glass-strong overflow-hidden">
-                <div className="relative h-64 lg:h-80 img-japan">
+                <div 
+                  className="relative h-64 lg:h-80 bg-cover bg-center transition-all duration-1000"
+                  style={{ backgroundImage: `url('https://image.pollinations.ai/prompt/beautiful%20scenic%20travel%20photography%20of%20${encodeURIComponent(tripData.destination)}%20landmark?width=1600&height=900&nologo=true')` }}
+                >
                   <div className="absolute inset-0 grid-bg opacity-30"></div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#08111C] via-transparent to-transparent"></div>
-                  <div className="absolute bottom-6 left-6 right-6 flex flex-wrap items-end justify-between gap-4">
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#08111C] via-[#08111C]/40 to-transparent"></div>
+                  <div className="absolute bottom-6 left-6 right-6 flex flex-wrap items-end justify-between gap-4 z-10">
                     <div>
                       <div className="flex items-center gap-3 mb-2">
                         <i className="fa-solid fa-location-dot text-[#FF6B4A]"></i>

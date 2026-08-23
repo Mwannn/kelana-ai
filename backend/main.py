@@ -117,7 +117,8 @@ def generate_trip_recommendation(trip_id: int, req: TripGenerateRequest, db: Ses
         destination=trip.destination,
         days=trip.days,
         budget=trip.budget,
-        travel_style=req.travel_style
+        travel_style=req.travel_style,
+        language=req.language
     )
     
     # Save Recommendation

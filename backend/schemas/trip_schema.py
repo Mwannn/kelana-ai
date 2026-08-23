@@ -24,3 +24,4 @@ class TripResponse(TripBase):
 
 class TripGenerateRequest(BaseModel):
     travel_style: str = "Standard"
+    language: str = "English"

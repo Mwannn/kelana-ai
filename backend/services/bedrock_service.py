@@ -17,23 +17,31 @@ def generate_itinerary(destination: str, days: int, budget: float, travel_style:
     
     # Session 5 & 6: Enhance prompt for richer AI output & Markdown format
     prompt = f"""
-    You are an experienced travel planner.
-    Create a {days}-day itinerary for {destination}.
-    Budget: USD {budget}
-    Travel Style: {travel_style}
+    You are an elite, highly experienced local travel expert and concierge.
+    I need a highly detailed, extremely accurate, and realistic {days}-day itinerary for {destination}.
+    My Budget: USD {budget} (please ensure recommendations align with this budget)
+    My Travel Style: {travel_style}
     
-    Please provide a structured response including:
-    - Daily itinerary cards (one card per day)
-    - Travel tips section
-    - Local food recommendations
-    - Estimated budget breakdown
-
-    For each daily itinerary, you must strictly follow these requirements:
-    - Morning activities: Provide exactly 2-3 specific morning activities.
-    - Afternoon activities: Include recommendations for cultural sites and local experiences.
-    - Evening activities: Suggest specific dinner spots and nightlife entertainment.
+    Provide a deeply comprehensive and structured response formatted beautifully in Markdown. Your response must include:
     
-    Format your response as Markdown with headers (##) and bullet lists (-).
+    1. 📝 **Trip Overview**: A brief summary of what to expect based on the {travel_style} style in {destination}.
+    
+    2. 🗓️ **Detailed Daily Itinerary**: For EACH day, break down the schedule thoroughly:
+       - **Morning**: Exact locations, what to do, why it's worth it, and insider tips. Include realistic timings.
+       - **Afternoon**: Highly specific cultural sites, hidden gems, or local experiences. Include transit/logistics tips between locations.
+       - **Evening**: Specific dinner spots (name actual restaurants), signature dishes to order, and nightlife/relaxation options.
+       *Important: Make sure the pacing is realistic and geographically logical.*
+       
+    3. 🍜 **Culinary Guide**: Top local dishes to try and specific, highly-rated restaurants or street food stalls to find them in {destination}.
+    
+    4. 💡 **Essential Travel Tips**:
+       - Cultural etiquette & local customs
+       - Best ways to get around (public transit, apps, etc.)
+       - Safety tips and tourist traps to avoid
+       
+    5. 💰 **Budget Breakdown**: A realistic breakdown of the USD {budget} covering Food, Transport, and Activities.
+    
+    Tone: Professional, inspiring, and incredibly knowledgeable. Use Markdown headers (##, ###), bold text for emphasis, and emojis to make it engaging and easy to read.
     """
     
     try:

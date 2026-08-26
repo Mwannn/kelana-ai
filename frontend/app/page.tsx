@@ -275,8 +275,23 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             
-            <div className="reveal">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(74,219,200,0.1)] border border-[rgba(74,219,200,0.25)] text-xs text-[#4ADBC8] mb-8">
+            <div className="reveal flex flex-col">
+              {/* Hero Destination Image */}
+              <div className="mb-8 rounded-2xl overflow-hidden shadow-2xl shadow-cyan-500/10 border border-white/10 relative h-64 sm:h-72 lg:h-80 w-full group">
+                <img src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Beautiful Alpine Destination" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#08111C] via-transparent to-transparent opacity-80"></div>
+                <div className="absolute bottom-5 left-6 right-6 flex justify-between items-end">
+                  <div>
+                    <h3 className="text-white font-display font-bold text-2xl drop-shadow-md">Explore the World</h3>
+                    <p className="text-white/80 text-sm mt-1">Discover your next destination</p>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                    <i className="fa-solid fa-arrow-right text-white"></i>
+                  </div>
+                </div>
+              </div>
+
+              <div className="inline-flex items-center self-start gap-2 px-3 py-1.5 rounded-full bg-[rgba(74,219,200,0.1)] border border-[rgba(74,219,200,0.25)] text-xs text-[#4ADBC8] mb-6 md:mb-8">
                 <span className="pulse-dot"></span>
                 AI Trip Planner · v2.0
               </div>
@@ -317,7 +332,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div>
                       <label className="block text-xs uppercase tracking-wider text-[#7B8395] mb-2 font-medium">Budget</label>
                       <div className="flex bg-[#08111C]/50 border border-[rgba(255,255,255,0.05)] rounded-xl focus-within:border-[#FF6B4A]/50 transition-colors">
@@ -350,7 +365,7 @@ export default function Home() {
 
                   <div>
                     <label className="block text-xs uppercase tracking-wider text-[#7B8395] mb-2 font-medium">Travel Style</label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3">
                       {['Luxury', 'Adventure', 'Cultural', 'Budget', 'Romantic', 'Foodie'].map(style => (
                         <button 
                           key={style}
@@ -366,7 +381,7 @@ export default function Home() {
 
                   <div>
                     <label className="block text-xs uppercase tracking-wider text-[#7B8395] mb-2 font-medium">Language</label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
                       {['English', 'Indonesian'].map(lang => (
                         <button 
                           key={lang}
@@ -513,6 +528,12 @@ export default function Home() {
               <span className="font-display font-bold text-white">KelanaAI</span>
             </div>
             <p>© 2026 KelanaAI · Plan your next adventure with AI</p>
+            <div className="flex flex-wrap gap-4 md:gap-6 mt-4 md:mt-0">
+              <a href="#" className="hover:text-white transition-colors">About Us</a>
+              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+              <a href="#" className="hover:text-white transition-colors">Contact</a>
+            </div>
           </div>
         </div>
       </footer>

@@ -2,181 +2,84 @@
 
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import * as THREE from 'three';
 
 export default function Home() {
-  const [destination, setDestination] = useState('Japan');
-  const [budget, setBudget] = useState('9000');
-  const [currency, setCurrency] = useState('IDR');
+  const [destination, setDestination] = useState('Jakarta Pusat Johar');
+  const [budget, setBudget] = useState('15000000');
   const [days, setDays] = useState('7');
-  const [travelStyle, setTravelStyle] = useState('Luxury');
+  const [travelStyle, setTravelStyle] = useState('budget');
   const [language, setLanguage] = useState('Indonesian');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [tripData, setTripData] = useState<any>(null);
-  const [loadStep, setLoadStep] = useState(0);
-  const [toastMsg, setToastMsg] = useState('');
   
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const recRef = useRef<HTMLElement>(null);
+  const [loading, setLoading] = useState(false);
+  const [tripData, setTripData] = useState<any>(null);
+  
+  const [toastMsg, setToastMsg] = useState({ title: '', msg: '', visible: false });
+  const [activeTab, setActiveTab] = useState('adventure');
+  
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [ringPos, setRingPos] = useState({ x: 0, y: 0 });
+  const [cursorHover, setCursorHover] = useState(false);
+  
+  const requestRef = useRef<number>();
 
-  // Three.js Background
+  // Custom Cursor Logic
   useEffect(() => {
-    if (!canvasRef.current) return;
-    const canvas = canvasRef.current;
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 0, 7);
-
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    const globeGroup = new THREE.Group();
-    scene.add(globeGroup);
-
-    // Wireframe globe
-    const globeGeo = new THREE.SphereGeometry(2.4, 48, 48);
-    const globeMat = new THREE.MeshBasicMaterial({
-      color: 0x4ADBC8,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.08,
-    });
-    globeGroup.add(new THREE.Mesh(globeGeo, globeMat));
-
-    // Dots on globe surface
-    const dotCount = 1800;
-    const dotPositions = [];
-    const dotColors = [];
-    for (let i = 0; i < dotCount; i++) {
-      const phi = Math.acos(-1 + (2 * i) / dotCount);
-      const theta = Math.sqrt(dotCount * Math.PI) * phi;
-      const r = 2.42;
-      const x = r * Math.cos(theta) * Math.sin(phi);
-      const y = r * Math.sin(theta) * Math.sin(phi);
-      const z = r * Math.cos(phi);
-
-      const noise = Math.sin(x * 1.5) * Math.cos(y * 1.5) * Math.sin(z * 1.5);
-      if (noise > -0.1) {
-        dotPositions.push(x, y, z);
-        if (noise > 0.3) dotColors.push(1, 0.42, 0.29);
-        else if (noise > 0.1) dotColors.push(1, 0.72, 0.27);
-        else dotColors.push(0.29, 0.86, 0.78);
-      }
-    }
-    const dotsGeo = new THREE.BufferGeometry();
-    dotsGeo.setAttribute('position', new THREE.Float32BufferAttribute(dotPositions, 3));
-    dotsGeo.setAttribute('color', new THREE.Float32BufferAttribute(dotColors, 3));
-    const dotsMat = new THREE.PointsMaterial({
-      size: 0.045,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.85,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    globeGroup.add(new THREE.Points(dotsGeo, dotsMat));
-
-    // Stars
-    const starCount = 800;
-    const starGeo = new THREE.BufferGeometry();
-    const starPos = new Float32Array(starCount * 3);
-    for (let i = 0; i < starCount; i++) {
-      const r = 12 + Math.random() * 20;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      starPos[i*3] = r * Math.sin(phi) * Math.cos(theta);
-      starPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
-      starPos[i*3+2] = r * Math.cos(phi);
-    }
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-    const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({
-      color: 0xffffff,
-      size: 0.03,
-      transparent: true,
-      opacity: 0.5,
-    }));
-    scene.add(stars);
-
-    function positionGlobe() {
-      if (window.innerWidth < 1024) {
-        globeGroup.position.set(0, -0.5, -2);
-        globeGroup.scale.setScalar(0.65);
-      } else {
-        globeGroup.position.set(2.8, 0.5, -1);
-        globeGroup.scale.setScalar(0.95);
-      }
-    }
-    positionGlobe();
-
-    let mouseX = 0, mouseY = 0;
-    const onMouseMove = (e: MouseEvent) => {
-      mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-      mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+    const handleMouseMove = (e: MouseEvent) => {
+      setCursorPos({ x: e.clientX, y: e.clientY });
     };
-    window.addEventListener('mousemove', onMouseMove);
 
-    const onResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      positionGlobe();
-    };
-    window.addEventListener('resize', onResize);
+    window.addEventListener('mousemove', handleMouseMove);
 
-    const clock = new THREE.Clock();
-    let reqId: number;
-    const animate = () => {
-      const t = clock.getElapsedTime();
-      globeGroup.rotation.y += 0.0015;
-      globeGroup.rotation.x += (mouseY * 0.15 - globeGroup.rotation.x) * 0.02;
-      camera.position.x += (mouseX * 0.3 - camera.position.x) * 0.03;
-      camera.position.y += (-mouseY * 0.2 - camera.position.y) * 0.03;
-      camera.lookAt(0, 0, 0);
-      stars.rotation.y = t * 0.01;
-      renderer.render(scene, camera);
-      reqId = requestAnimationFrame(animate);
+    const animateRing = () => {
+      setRingPos((prev) => {
+        const dx = cursorPos.x - prev.x;
+        const dy = cursorPos.y - prev.y;
+        return {
+          x: prev.x + dx * 0.15,
+          y: prev.y + dy * 0.15,
+        };
+      });
+      requestRef.current = requestAnimationFrame(animateRing);
     };
-    animate();
+
+    requestRef.current = requestAnimationFrame(animateRing);
 
     return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('resize', onResize);
-      cancelAnimationFrame(reqId);
-      renderer.dispose();
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
-  }, []);
+  }, [cursorPos]);
 
-  // Intersection Observer for .reveal
+  // Observer for Reveal animations
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) e.target.classList.add('in');
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-    
+
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     return () => observer.disconnect();
   });
 
-  const showToast = (msg: string) => {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(''), 3000);
+  const showToast = (title: string, msg: string) => {
+    setToastMsg({ title, msg, visible: true });
+    setTimeout(() => {
+      setToastMsg(prev => ({ ...prev, visible: false }));
+    }, 3500);
   };
+
+  const handleCursorEnter = () => setCursorHover(true);
+  const handleCursorLeave = () => setCursorHover(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!destination || !budget || !days) return;
     
     setLoading(true);
-    setError(null);
     setTripData(null);
-    setLoadStep(1);
-
-    // Simulate loading steps animation
-    setTimeout(() => setLoadStep(2), 1500);
-    setTimeout(() => setLoadStep(3), 3000);
 
     try {
       const saveRes = await fetch('http://localhost:8000/api/v1/trips', {
@@ -185,7 +88,7 @@ export default function Home() {
         body: JSON.stringify({
           destination,
           budget: parseFloat(budget),
-          currency,
+          currency: 'IDR',
           days: parseInt(days, 10),
           travel_style: travelStyle,
         }),
@@ -204,353 +107,684 @@ export default function Home() {
       const generatedTrip = await genRes.json();
       
       setTripData(generatedTrip);
-      setLoadStep(4);
-      showToast(`AI itinerary generated for ${destination}!`);
-      
-      setTimeout(() => {
-        if (recRef.current) recRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 500);
-      
+      showToast('Trip berhasil dibuat!', `Itinerary ${days} hari di ${destination} siap.`);
     } catch (err: any) {
-      setError('Unable to generate itinerary. Please try again.');
       console.error(err);
-      setLoadStep(0);
+      showToast('Gagal', 'Terjadi kesalahan saat membuat itinerary.');
     } finally {
       setLoading(false);
     }
   };
 
+  const tabData: Record<string, any> = {
+    adventure: {
+      title: 'Untuk yang tak takut lelah.',
+      desc: 'Mendaki gunung berapi aktif, menyusuri gua bawah tanah, atau mengarungi jeram sungai. Petualangan kami ditangani pemandu bersertifikat.',
+      img: 'https://picsum.photos/seed/adventure-tab/800/700.jpg',
+      stats: ['Pemandu Bersertifikat', 'Peralatan Standar Intl', 'Asuransi Tercover', 'Maks 8 Orang']
+    },
+    culture: {
+      title: 'Duduk, dengar, dan mengerti.',
+      desc: 'Tidur di rumah adat, belajar menenun dari para tetua. Bukan tur yang dilewatkan cepat — tapi pengalaman yang meresap.',
+      img: 'https://picsum.photos/seed/culture-tab/800/700.jpg',
+      stats: ['Tinggal dengan Komunitas', 'Bahasa Dipandu Ahli', 'Etika Tradisional', 'Kerajinan Tangan']
+    },
+    culinary: {
+      title: 'Makan di tempatnya dibuat.',
+      desc: 'Dari sate keliling di Yogyakarta sampai ikan bakar di rumah nelayan Madura. Beli bahan di pasar pagi, lalu masak bersama tuan rumah.',
+      img: 'https://picsum.photos/seed/culinary-tab/800/700.jpg',
+      stats: ['Kelas Masak Lokal', 'Pasar Tradisional', 'Vegetarian & Halal', 'Bukan Turist Trap']
+    },
+    wellness: {
+      title: 'Pelan, dalam, dan tenang.',
+      desc: 'Meditasi di atas bukit dengan kabut masih menempel. Yoga subuh di tepi sawah. Atau sekadar diam — tanpa jadwal, tanpa notifikasi.',
+      img: 'https://picsum.photos/seed/wellness-tab/800/700.jpg',
+      stats: ['Jauh dari Keramaian', 'Instruktur Yoga', 'Makanan Organik', 'Tanpa Jadwal Padat']
+    }
+  };
+
+  const activeTabData = tabData[activeTab];
+
   return (
-    <div className="relative">
-      {/* Aurora background */}
-      <div className="aurora-bg">
-        <div className="aurora-orb orb-1"></div>
-        <div className="aurora-orb orb-2"></div>
-        <div className="aurora-orb orb-3"></div>
-      </div>
+    <>
+      <div 
+        className="cursor-dot hidden md:block" 
+        style={{ transform: `translate(${cursorPos.x - 3}px, ${cursorPos.y - 3}px)` }}
+      ></div>
+      <div 
+        className={`cursor-ring hidden md:block ${cursorHover ? 'cursor-hover' : ''}`} 
+        style={{ left: `${ringPos.x}px`, top: `${ringPos.y}px` }}
+      ></div>
 
-      {/* 3D Canvas */}
-      <canvas id="bgCanvas" ref={canvasRef}></canvas>
-
-      {/* Navbar */}
-      <header className="nav-glass fixed top-0 left-0 right-0 z-50">
-        <nav className="max-w-7xl mx-auto px-6 lg:px-10 py-4 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-2.5 group">
-            <div className="relative w-10 h-10">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#FF6B4A] to-[#FFB845] rounded-xl rotate-45 group-hover:rotate-[225deg] transition-transform duration-700"></div>
-              <div className="absolute inset-1.5 bg-[#08111C] rounded-md rotate-45 group-hover:rotate-[225deg] transition-transform duration-700"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <i className="fa-solid fa-compass text-[#FF6B4A] text-sm group-hover:rotate-180 transition-transform duration-700"></i>
-              </div>
-            </div>
-            <span className="font-display font-bold text-xl">KelanaAI</span>
+      {/* Navigation */}
+      <nav className="nav-glass fixed top-0 left-0 right-0 z-50">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
+          <a href="#" className="flex items-center gap-2" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+            <img src="/logo-kelanaai.png" alt="Loka Logo" className="w-8 h-8 object-contain" />
+            <span className="font-display text-xl font-black tracking-tight">Loka<span className="text-[#E85D2F]">.</span></span>
           </a>
-          {/* Navigation menus hidden for now based on user request */}
-          {/* <div className="hidden lg:flex items-center gap-9 text-sm">
-            <a href="#" className="text-[#7B8395] hover:text-white transition-colors">Destinations</a>
-            <a href="#form" className="text-[#7B8395] hover:text-white transition-colors">Plan Trip</a>
-            <a href="#recommendation" className="text-[#7B8395] hover:text-white transition-colors">Sample</a>
+          <div className="hidden lg:flex items-center gap-8 text-sm font-medium">
+            <a href="#destinations" className="hover:text-[#E85D2F] transition-colors" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Destinasi</a>
+            <a href="#planner" className="hover:text-[#E85D2F] transition-colors" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Buat Trip</a>
+            <a href="#experiences" className="hover:text-[#E85D2F] transition-colors" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Pengalaman</a>
+            <a href="#journal" className="hover:text-[#E85D2F] transition-colors" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Jurnal</a>
           </div>
           <div className="flex items-center gap-3">
-            <button className="hidden md:inline-flex btn-ghost text-sm" onClick={() => showToast('Opening sign in...')}>Sign In</button>
-            <button className="btn-primary text-sm flex items-center gap-2" onClick={() => showToast('Welcome to KelanaAI!')}>
-              Get Started <i className="fa-solid fa-arrow-right text-xs"></i>
+            <button className="hidden md:block text-sm font-medium" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Masuk</button>
+            <button className="btn-primary px-5 py-2.5 rounded-full text-sm font-semibold" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+              <span>Mulai Perjalanan</span>
             </button>
-          </div> */}
-        </nav>
-      </header>
-
-      {/* Hero + Form */}
-      <section id="form" className="relative min-h-screen pt-32 pb-20 z-10">
-        <div className="float-tag hidden lg:flex" style={{ top: '22%', left: '4%' }}>
-          <i className="fa-solid fa-plane"></i> 247 Destinations
+          </div>
         </div>
-        <div className="float-tag hidden lg:flex" style={{ top: '35%', right: '4%', animationDelay: '1.5s' }}>
-          <i className="fa-solid fa-globe"></i> AI-Powered
-        </div>
-        <div className="float-tag hidden lg:flex" style={{ bottom: '28%', left: '6%', animationDelay: '3s' }}>
-          <i className="fa-solid fa-star"></i> 4.9/5 Rating
-        </div>
+      </nav>
 
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            
-            <div className="reveal flex flex-col relative z-10">
-              {/* Ambient Glow behind image */}
-              <div className="absolute top-10 left-10 w-64 h-64 bg-cyan-500/30 rounded-full blur-[80px] pointer-events-none"></div>
-              {/* Hero Destination Image */}
-              <div className="mb-8 rounded-[2rem] overflow-hidden shadow-[0_0_40px_-10px_rgba(74,219,200,0.3)] ring-1 ring-white/10 relative h-64 sm:h-72 lg:h-80 w-full group transition-all duration-700 hover:shadow-[0_0_60px_-15px_rgba(74,219,200,0.5)] hover:ring-white/30">
-                <img src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Beautiful Alpine Destination" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#08111C] via-transparent to-transparent opacity-80"></div>
-                <div className="absolute bottom-5 left-6 right-6 flex justify-between items-end">
-                  <div>
-                    <h3 className="text-white font-display font-bold text-2xl drop-shadow-md">Explore the World</h3>
-                    <p className="text-white/80 text-sm mt-1">Discover your next destination</p>
-                  </div>
-                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                    <i className="fa-solid fa-arrow-right text-white"></i>
-                  </div>
-                </div>
-              </div>
-
-              <div className="inline-flex items-center self-start gap-2 px-3 py-1.5 rounded-full bg-[rgba(74,219,200,0.1)] border border-[rgba(74,219,200,0.25)] text-xs text-[#4ADBC8] mb-6 md:mb-8">
-                <span className="pulse-dot"></span>
-                AI Trip Planner · v2.0
-              </div>
-              <h1 className="font-display font-bold text-[clamp(3.5rem,8vw,7.5rem)] leading-[0.9] tracking-tight hero-title relative z-10">
-                <span className="text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">Plan</span> your<br/>
-                next <span className="gradient-text">adventure</span><br/>
-                <span className="text-white/40 font-light italic">with</span> <span className="italic font-light text-white">AI.</span>
-              </h1>
-              <p className="mt-8 text-lg lg:text-xl text-[#7B8395] max-w-xl">
-                Tell us where, when, and how you love to travel. KelanaAI crafts a personalized itinerary in seconds — built around your budget, your style, your pace.
+      {/* Hero Section */}
+      <section className="relative min-h-screen pt-28 pb-12 overflow-hidden">
+        <div className="particle" style={{ top: '20%', left: '80%', width: '8px', height: '8px', animationDelay: '0s' }}></div>
+        <div className="particle" style={{ top: '60%', left: '10%', width: '12px', height: '12px', animationDelay: '2s', background: '#E85D2F' }}></div>
+        <div className="particle" style={{ top: '80%', left: '90%', width: '6px', height: '6px', animationDelay: '4s' }}></div>
+        
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 relative z-10">
+          <div className="flex items-center gap-3 mb-8">
+            <span className="w-12 h-px bg-[#1A1612]"></span>
+            <span className="section-num">001 — Perkenalan</span>
+          </div>
+          
+          <h1 className="hero-title">
+            Jelajah <em>nusantara</em><br/>
+            <span className="text-stroke">temukan</span> diri.
+          </h1>
+          
+          <div className="grid lg:grid-cols-12 gap-8 mt-16 items-end">
+            <div className="lg:col-span-5">
+              <p className="text-lg leading-relaxed text-[#1A1612]/80">
+                Bukan sekadar liburan. Setiap perjalanan kami dirancang oleh pemandu lokal yang tahu jalan pulang ke rumahnya — lewat jalan setapak, pasar tradisional, dan senja yang berbeda di setiap pesisir.
               </p>
-              <div className="mt-10 flex flex-wrap items-center gap-6 text-sm text-[#7B8395]">
-                <div className="flex items-center gap-2"><i className="fa-solid fa-bolt text-[#FFB845]"></i> Generates in 8 seconds</div>
-                <div className="flex items-center gap-2"><i className="fa-solid fa-shield-halved text-[#4ADBC8]"></i> Free to try</div>
-                <div className="flex items-center gap-2"><i className="fa-solid fa-language text-[#FF6B4A]"></i> 50+ languages</div>
+              
+              <div className="flex items-center gap-6 mt-8">
+                <div>
+                  <div className="font-mono text-xs text-[#6B5D4F] mb-1">PELANCONG</div>
+                  <div className="font-display text-3xl font-bold">12K+</div>
+                </div>
+                <div className="w-px h-12 bg-[#1A1612]/20"></div>
+                <div>
+                  <div className="font-mono text-xs text-[#6B5D4F] mb-1">DESTINASI</div>
+                  <div className="font-display text-3xl font-bold">86</div>
+                </div>
+                <div className="w-px h-12 bg-[#1A1612]/20"></div>
+                <div>
+                  <div className="font-mono text-xs text-[#6B5D4F] mb-1">RATING</div>
+                  <div className="font-display text-3xl font-bold">4.9</div>
+                </div>
               </div>
             </div>
-
-            <div className="reveal relative group" style={{ transitionDelay: '0.15s' }}>
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#FF6B4A] via-[#FFB845] to-[#4ADBC8] rounded-[2.5rem] blur-2xl opacity-10 group-hover:opacity-30 transition duration-1000 group-hover:duration-300"></div>
-              <div className="glass-strong p-7 lg:p-10 relative rounded-[2rem] border border-white/10">
-                <div className="absolute top-0 left-10 right-10 h-[2px] bg-gradient-to-r from-transparent via-[#FF6B4A] to-transparent opacity-80"></div>
-                <div className="flex items-center justify-between mb-7">
-                  <div>
-                    <h2 className="font-display text-2xl font-bold">Plan Your Trip</h2>
-                    <p className="text-xs text-[#7B8395] mt-1">Fill in your preferences below</p>
-                  </div>
-                  <div className="w-10 h-10 rounded-full bg-[rgba(255,107,74,0.1)] border border-[rgba(255,107,74,0.3)] flex items-center justify-center">
-                    <i className="fa-solid fa-wand-magic-sparkles text-[#FF6B4A]"></i>
-                  </div>
+            
+            <div className="lg:col-span-7 relative h-[400px] lg:h-[500px]">
+              <div className="absolute top-0 right-0 w-64 h-80 rounded-3xl overflow-hidden shadow-2xl" style={{ transform: 'rotate(4deg)' }}>
+                <img src="https://picsum.photos/seed/bali-hero/500/700.jpg" className="w-full h-full object-cover" alt="" />
+              </div>
+              <div className="absolute top-32 left-0 w-56 h-64 rounded-3xl overflow-hidden shadow-2xl" style={{ transform: 'rotate(-6deg)' }}>
+                <img src="https://picsum.photos/seed/flores-hero/400/500.jpg" className="w-full h-full object-cover" alt="" />
+              </div>
+              <div className="absolute bottom-0 right-1/3 w-48 h-48 rounded-3xl overflow-hidden shadow-2xl" style={{ transform: 'rotate(8deg)' }}>
+                <img src="https://picsum.photos/seed/raja-hero/400/400.jpg" className="w-full h-full object-cover" alt="" />
+              </div>
+              
+              <div className="absolute top-10 left-1/3 glass-card rounded-2xl p-4 shadow-xl w-52" style={{ transform: 'rotate(5deg)' }}>
+                <div className="flex items-center gap-1 mb-2">
+                  <i className="fa-solid fa-star text-[#D4A24C] text-xs"></i>
+                  <i className="fa-solid fa-star text-[#D4A24C] text-xs"></i>
+                  <i className="fa-solid fa-star text-[#D4A24C] text-xs"></i>
+                  <i className="fa-solid fa-star text-[#D4A24C] text-xs"></i>
+                  <i className="fa-solid fa-star text-[#D4A24C] text-xs"></i>
                 </div>
+                <p className="text-sm font-medium text-[#1A1612]">"Perjalanan terbaik seumur hidup saya."</p>
+                <p className="text-xs text-[#6B5D4F] mt-2 font-mono">— Dewi, Jakarta</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[#6B5D4F] text-xs flex flex-col items-center gap-2" style={{ animation: 'scroll-bounce 2s ease-in-out infinite' }}>
+          <span className="font-mono tracking-widest">SCROLL</span>
+          <div className="w-px h-8 bg-[#1A1612]/30"></div>
+        </div>
+      </section>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Marquee */}
+      <section className="bg-[#1A1612] py-6 overflow-hidden">
+        <div className="marquee-track text-[#F4EFE6]">
+          <span className="font-display text-2xl font-bold italic">Bali</span>
+          <i className="fa-solid fa-circle text-[8px] text-[#E85D2F]"></i>
+          <span className="font-display text-2xl font-bold">Labuan Bajo</span>
+          <i className="fa-solid fa-circle text-[8px] text-[#E85D2F]"></i>
+          <span className="font-display text-2xl font-bold italic">Raja Ampat</span>
+          <i className="fa-solid fa-circle text-[8px] text-[#E85D2F]"></i>
+          <span className="font-display text-2xl font-bold">Bromo</span>
+          <i className="fa-solid fa-circle text-[8px] text-[#E85D2F]"></i>
+          <span className="font-display text-2xl font-bold italic">Danau Toba</span>
+          <i className="fa-solid fa-circle text-[8px] text-[#E85D2F]"></i>
+          <span className="font-display text-2xl font-bold">Lombok</span>
+          <i className="fa-solid fa-circle text-[8px] text-[#E85D2F]"></i>
+          <span className="font-display text-2xl font-bold italic">Bali</span>
+          <i className="fa-solid fa-circle text-[8px] text-[#E85D2F]"></i>
+          <span className="font-display text-2xl font-bold">Labuan Bajo</span>
+          <i className="fa-solid fa-circle text-[8px] text-[#E85D2F]"></i>
+          <span className="font-display text-2xl font-bold italic">Raja Ampat</span>
+          <i className="fa-solid fa-circle text-[8px] text-[#E85D2F]"></i>
+          <span className="font-display text-2xl font-bold">Bromo</span>
+          <i className="fa-solid fa-circle text-[8px] text-[#E85D2F]"></i>
+          <span className="font-display text-2xl font-bold italic">Danau Toba</span>
+          <i className="fa-solid fa-circle text-[8px] text-[#E85D2F]"></i>
+          <span className="font-display text-2xl font-bold">Lombok</span>
+          <i className="fa-solid fa-circle text-[8px] text-[#E85D2F]"></i>
+        </div>
+      </section>
+
+      {/* AI Trip Planner */}
+      <section id="planner" className="py-24 lg:py-32 relative overflow-hidden bg-[#F4EFE6]">
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-12 relative">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12 reveal">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="w-12 h-px bg-[#1A1612]"></span>
+                <span className="section-num">002 — Perencanaan</span>
+              </div>
+              <h2 className="editorial-title">
+                Buat <em>trip</em> sesuka<br/>hati Anda.
+              </h2>
+            </div>
+            <p className="text-[#6B5D4F] text-lg max-w-md leading-relaxed">
+              Isi preferensi Anda di bawah ini, dan biarkan AI kami menyusun itinerary harian yang realistis dengan harga transparan.
+            </p>
+          </div>
+          
+          <div className="planner-card p-8 lg:p-12 reveal">
+            <div className="grid lg:grid-cols-2 gap-12 relative z-10">
+              {/* Form Side */}
+              <div>
+                <h3 className="font-display text-3xl font-bold mb-2">Plan Your Trip</h3>
+                <p className="text-[#6B5D4F] text-sm mb-8">Isi detail di bawah untuk memulai.</p>
+                
+                <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-[#7B8395] mb-2 font-medium">Destination</label>
-                    <div className="input-wrap relative">
-                      <i className="input-icon fa-solid fa-location-dot"></i>
-                      <input type="text" value={destination} onChange={e => setDestination(e.target.value)} required className="input-field" placeholder="Where to?" />
+                    <label className="font-mono text-xs uppercase tracking-widest text-[#6B5D4F]">Destinasi</label>
+                    <input 
+                      type="text" 
+                      value={destination} 
+                      onChange={e => setDestination(e.target.value)}
+                      required
+                      className="input-line" 
+                      onMouseEnter={handleCursorEnter} 
+                      onMouseLeave={handleCursorLeave}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <label className="font-mono text-xs uppercase tracking-widest text-[#6B5D4F]">Budget (IDR)</label>
+                      <input 
+                        type="number" 
+                        value={budget} 
+                        onChange={e => setBudget(e.target.value)}
+                        required
+                        className="input-line" 
+                        onMouseEnter={handleCursorEnter} 
+                        onMouseLeave={handleCursorLeave}
+                      />
+                    </div>
+                    <div>
+                      <label className="font-mono text-xs uppercase tracking-widest text-[#6B5D4F]">Durasi (Hari)</label>
+                      <input 
+                        type="number" 
+                        value={days} 
+                        onChange={e => setDays(e.target.value)}
+                        required
+                        className="input-line" 
+                        onMouseEnter={handleCursorEnter} 
+                        onMouseLeave={handleCursorLeave}
+                      />
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                    <div>
-                      <label className="block text-xs uppercase tracking-wider text-[#7B8395] mb-2 font-medium">Budget</label>
-                      <div className="flex bg-[#08111C]/50 border border-[rgba(255,255,255,0.05)] rounded-xl focus-within:border-[#FF6B4A]/50 transition-colors">
-                        <select 
-                          value={currency} 
-                          onChange={e => setCurrency(e.target.value)} 
-                          className="bg-transparent text-white px-4 outline-none border-r border-[rgba(255,255,255,0.05)] text-sm appearance-none cursor-pointer"
-                        >
-                          <option value="IDR" className="bg-[#0F1B2D]">IDR</option>
-                          <option value="USD" className="bg-[#0F1B2D]">USD</option>
-                        </select>
-                        <input 
-                          type="number" 
-                          value={budget} 
-                          onChange={e => setBudget(e.target.value)} 
-                          required 
-                          className="flex-1 bg-transparent text-white px-4 py-3.5 outline-none placeholder-[#7B8395] text-sm" 
-                          placeholder="0" 
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-xs uppercase tracking-wider text-[#7B8395] mb-2 font-medium">Days</label>
-                      <div className="input-wrap relative">
-                        <i className="input-icon fa-solid fa-calendar-days"></i>
-                        <input type="number" value={days} onChange={e => setDays(e.target.value)} required className="input-field" placeholder="0" />
-                      </div>
-                    </div>
-                  </div>
-
+                  
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-[#7B8395] mb-2 font-medium">Travel Style</label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3">
-                      {['Luxury', 'Adventure', 'Cultural', 'Budget', 'Romantic', 'Foodie'].map(style => (
+                    <label className="font-mono text-xs uppercase tracking-widest text-[#6B5D4F]">Gaya Perjalanan</label>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {['budget', 'luxury', 'adventure', 'cultural', 'relaxation'].map(style => (
                         <button 
                           key={style}
-                          type="button" 
+                          type="button"
                           onClick={() => setTravelStyle(style)}
-                          className={`style-pill ${travelStyle === style ? 'active' : ''}`}
+                          className={`style-tag ${travelStyle === style ? 'active' : ''}`}
+                          onMouseEnter={handleCursorEnter} 
+                          onMouseLeave={handleCursorLeave}
                         >
-                          {style}
+                          {style.charAt(0).toUpperCase() + style.slice(1)}
                         </button>
                       ))}
                     </div>
                   </div>
-
+                  
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-[#7B8395] mb-2 font-medium">Language</label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
-                      {['English', 'Indonesian'].map(lang => (
-                        <button 
-                          key={lang}
-                          type="button" 
-                          onClick={() => setLanguage(lang)}
-                          className={`style-pill ${language === lang ? 'active' : ''}`}
-                        >
-                          {lang}
-                        </button>
-                      ))}
-                    </div>
+                    <label className="font-mono text-xs uppercase tracking-widest text-[#6B5D4F]">Bahasa Pemandu</label>
+                    <select 
+                      value={language}
+                      onChange={e => setLanguage(e.target.value)}
+                      className="input-line" 
+                      style={{ appearance: 'none', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%231A1612' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right center' }}
+                      onMouseEnter={handleCursorEnter} 
+                      onMouseLeave={handleCursorLeave}
+                    >
+                      <option value="Indonesian">Indonesian</option>
+                      <option value="English">English</option>
+                      <option value="Mandarin">Mandarin</option>
+                      <option value="Japanese">Japanese</option>
+                    </select>
                   </div>
-
-                  {error && <div className="text-red-400 text-sm">{error}</div>}
-
-                  <button type="submit" disabled={loading} className="btn-primary w-full flex items-center justify-center gap-2.5 mt-6 relative overflow-hidden group/btn shadow-[0_0_20px_rgba(255,107,74,0.2)] hover:shadow-[0_0_40px_rgba(255,107,74,0.6)]">
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-[100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
-                    <span className="relative z-10 flex items-center gap-2.5">
-                      {loading ? (
-                         <>
-                           <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                           Crafting itinerary...
-                         </>
-                      ) : (
-                        <>
-                          <i className="fa-solid fa-wand-magic-sparkles"></i>
-                          Generate AI Trip
-                          <i className="fa-solid fa-arrow-right text-xs"></i>
-                        </>
-                      )}
+                  
+                  <button 
+                    type="submit" 
+                    disabled={loading}
+                    className="btn-primary w-full py-4 rounded-full font-bold text-base mt-4 flex items-center justify-center gap-3"
+                    onMouseEnter={handleCursorEnter} 
+                    onMouseLeave={handleCursorLeave}
+                  >
+                    <span className="flex items-center gap-3">
+                      {loading ? 'Menyusun Itinerary...' : 'Generate AI Trip'}
+                      {!loading && <i className="fa-solid fa-arrow-right"></i>}
                     </span>
                   </button>
                 </form>
               </div>
+              
+              {/* Result Side */}
+              <div className="bg-[#F4EFE6] rounded-2xl p-6 lg:p-8 relative overflow-hidden min-h-[400px]">
+                {!tripData && !loading && (
+                  <div className="h-full flex flex-col items-center justify-center text-center text-[#6B5D4F]">
+                    <div className="w-16 h-16 rounded-full bg-[#1A1612]/5 flex items-center justify-center mb-4">
+                      <i className="fa-solid fa-wand-magic-sparkles text-2xl text-[#E85D2F]"></i>
+                    </div>
+                    <p className="font-medium max-w-xs">Itinerary yang dihasilkan AI akan muncul di sini. Klik tombol generate untuk memulai!</p>
+                  </div>
+                )}
+                
+                {tripData && !loading && (
+                  <div>
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <div className="font-mono text-xs text-[#6B5D4F] mb-1">ITINERARY ANDA</div>
+                        <h4 className="font-display text-2xl font-bold">{tripData.destination}</h4>
+                      </div>
+                      <div className="text-right">
+                        <div class="font-mono text-xs text-[#6B5D4F] mb-1">ESTIMASI</div>
+                        <div className="font-display text-xl font-bold text-[#E85D2F]">
+                          {tripData.currency === 'IDR' ? 'Rp' : '$'} {Number(tripData.budget).toLocaleString('id-ID')}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 markdown-content text-sm">
+                      <ReactMarkdown>{tripData.ai_recommendation}</ReactMarkdown>
+                    </div>
+                  </div>
+                )}
+                
+                {loading && (
+                  <div className="absolute inset-0 bg-[#F4EFE6]/80 backdrop-blur-sm flex flex-col items-center justify-center z-20">
+                    <div className="w-12 h-12 border-4 border-[#1A1612]/20 border-t-[#E85D2F] rounded-full animate-spin"></div>
+                    <p className="mt-4 font-mono text-sm text-[#6B5D4F]">AI sedang berpikir...</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Recommendation Section */}
-      <section id="recommendation" ref={recRef} className="relative py-24 z-10">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+      {/* Destinations Bento Grid */}
+      <section id="destinations" className="py-24 lg:py-32 bg-[#E8DFC9]">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-8 mb-16">
+            <div className="reveal">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="w-12 h-px bg-[#1A1612]"></span>
+                <span className="section-num">003 — Pilihan Destinasi</span>
+              </div>
+              <h2 className="editorial-title">
+                Tempat-tempat yang <em>bercerita</em>.
+              </h2>
+            </div>
+            <div className="flex items-end reveal">
+              <p className="text-lg leading-relaxed text-[#6B5D4F]">
+                Dari Sabang sampai Merauke, kami hanya menampilkan sudut yang membuat Anda ingin tinggal lebih lama. Dipilih oleh tim editorial kami, bukan algoritma.
+              </p>
+            </div>
+          </div>
           
-          {loading && (
-            <div className="glass-strong mb-12">
-              <div className="ai-loader">
-                <div className="loader-ring"></div>
-                <div className="text-center">
-                  <div className="font-display text-xl font-semibold">Crafting your itinerary...</div>
-                  <div className="text-sm text-[#7B8395] mt-2">Analyzing destinations, optimizing routes, matching your style</div>
+          <div className="grid grid-cols-12 gap-4 lg:gap-6 auto-rows-[240px]">
+            <div className="bento-card col-span-12 lg:col-span-8 row-span-2 reveal" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+              <img src="https://picsum.photos/seed/bromo-bento/900/700.jpg" className="absolute inset-0 w-full h-full object-cover" alt="" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+              <div className="absolute inset-0 p-8 flex flex-col justify-end text-white">
+                <div className="card-overlay mb-4">
+                  <p className="max-w-md text-white/80">Lihat matahari terbit dari atas lautan pasir, lalu mendaki kawah aktif yang masih mengeluarkan asap tebal.</p>
                 </div>
-                <div className="flex flex-wrap justify-center gap-4 text-xs">
-                  <span className={`load-step ${loadStep >= 1 ? 'done' : ''}`}>
-                    {loadStep >= 1 ? '✓ Researched destination' : '· Researching destination'}
-                  </span>
-                  <span className={`load-step ${loadStep >= 2 ? 'done' : ''}`}>
-                    {loadStep >= 2 ? '✓ Budget optimized' : '· Optimizing budget'}
-                  </span>
-                  <span className={`load-step ${loadStep >= 3 ? 'done' : ''}`}>
-                    {loadStep >= 3 ? '✓ Experiences curated' : '· Curating experiences'}
-                  </span>
+                <div className="flex items-end justify-between">
+                  <div>
+                    <div className="font-mono text-xs text-white/60 mb-2">JAWA TIMUR</div>
+                    <h3 className="font-display font-black text-4xl lg:text-6xl leading-none">Bromo Tengger</h3>
+                    <div className="mt-3 font-mono text-sm">Mulai IDR 1.850K · 3 Hari</div>
+                  </div>
+                  <div className="w-12 h-12 rounded-full bg-[#E85D2F] flex items-center justify-center">
+                    <i className="fa-solid fa-arrow-right text-white"></i>
+                  </div>
                 </div>
               </div>
             </div>
-          )}
-
-          {tripData && !loading && (
-            <div className="space-y-8 reveal in">
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-                <div>
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="w-8 h-px bg-[#FF6B4A]"></span>
-                    <span className="text-xs tracking-widest uppercase text-[#FF6B4A]">AI Recommendation</span>
-                  </div>
-                  <h2 className="font-display font-bold text-4xl lg:text-6xl leading-[0.95]">
-                    Your <span className="gradient-text">{tripData.days}-day</span><br/>
-                    {tripData.destination} adventure
-                  </h2>
-                </div>
-                <div className="flex gap-2 flex-wrap">
-                  <button className="btn-ghost text-sm flex items-center gap-2" onClick={() => showToast('Saved!')}><i className="fa-solid fa-bookmark"></i> Save</button>
-                  <button className="btn-ghost text-sm flex items-center gap-2" onClick={() => showToast('Shared!')}><i className="fa-solid fa-share-nodes"></i> Share</button>
-                </div>
+            
+            <div className="bento-card col-span-12 sm:col-span-6 lg:col-span-4 reveal" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+              <img src="https://picsum.photos/seed/raja-bento/600/400.jpg" className="absolute inset-0 w-full h-full object-cover" alt="" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+              <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                <div className="font-mono text-xs text-white/60 mb-1">PAPUA BARAT DAYA</div>
+                <h3 className="font-display font-bold text-3xl">Raja Ampat</h3>
+                <div className="font-mono text-sm mt-2">Mulai IDR 8.500K</div>
               </div>
-
-              {/* Hero Banner with Dynamic Data */}
-              <div className="glass-strong overflow-hidden">
-                <div 
-                  className="relative h-64 lg:h-80 bg-cover bg-center transition-all duration-1000"
-                  style={{ backgroundImage: `url('https://image.pollinations.ai/prompt/beautiful%20scenic%20travel%20photography%20of%20${encodeURIComponent(tripData.destination)}%20landmark?width=1600&height=900&nologo=true')` }}
-                >
-                  <div className="absolute inset-0 grid-bg opacity-30"></div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#08111C] via-[#08111C]/40 to-transparent"></div>
-                  <div className="absolute bottom-6 left-6 right-6 flex flex-wrap items-end justify-between gap-4 z-10">
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <i className="fa-solid fa-location-dot text-[#FF6B4A]"></i>
-                        <span className="text-sm text-[#F0F4F8]/80">Custom Generated</span>
-                      </div>
-                      <h3 className="font-display text-4xl lg:text-5xl font-bold">{tripData.destination}</h3>
-                    </div>
-                    <div className="flex gap-2 flex-wrap">
-                      <span className="px-3 py-1.5 rounded-full bg-[rgba(255,107,74,0.2)] border border-[rgba(255,107,74,0.4)] text-xs text-[#FF8A5C]"><i className="fa-solid fa-crown mr-1.5"></i> {tripData.category}</span>
-                      <span className="px-3 py-1.5 rounded-full bg-[rgba(74,219,200,0.15)] border border-[rgba(74,219,200,0.35)] text-xs text-[#4ADBC8]"><i className="fa-solid fa-calendar mr-1.5"></i> {tripData.days} Days</span>
-                      <span className="px-3 py-1.5 rounded-full bg-[rgba(255,184,69,0.15)] border border-[rgba(255,184,69,0.35)] text-xs text-[#FFB845]"><i className={`fa-solid ${tripData.currency === 'IDR' ? 'fa-money-bill' : 'fa-dollar-sign'} mr-1.5`}></i> {tripData.currency === 'IDR' ? 'Rp' : '$'} {Number(tripData.budget).toLocaleString('id-ID')}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Generated Markdown inside Glass Card */}
-              <div className="glass p-8 lg:p-12">
-                <div className="markdown-content prose-invert">
-                  <ReactMarkdown>{tripData.ai_recommendation}</ReactMarkdown>
-                </div>
-              </div>
-              
-              {/* Refine CTA */}
-              <div className="glass-strong p-8 lg:p-12 text-center relative overflow-hidden mt-8">
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-[#FF6B4A] opacity-10 blur-[100px]"></div>
-                </div>
-                <div className="relative">
-                  <h3 className="font-display text-3xl lg:text-4xl font-bold mb-3">Ready to make this real?</h3>
-                  <p className="text-[#7B8395] mb-6 max-w-md mx-auto">Save your itinerary, share with travel companions, or let our AI refine it further.</p>
-                  <div className="flex flex-wrap items-center justify-center gap-3">
-                    <button className="btn-primary flex items-center gap-2" onClick={() => showToast('Saved to account!')}><i className="fa-solid fa-bookmark"></i> Save Trip</button>
-                    <button className="btn-ghost flex items-center gap-2" onClick={() => showToast('Opening AI refinement...')}><i className="fa-solid fa-pen-to-square"></i> Refine with AI</button>
-                  </div>
-                </div>
-              </div>
-
             </div>
-          )}
+            
+            <div className="bento-card col-span-12 sm:col-span-6 lg:col-span-4 reveal" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+              <img src="https://picsum.photos/seed/toba-bento/600/400.jpg" className="absolute inset-0 w-full h-full object-cover" alt="" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+              <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                <div className="font-mono text-xs text-white/60 mb-1">SUMATERA UTARA</div>
+                <h3 className="font-display font-bold text-3xl">Danau Toba</h3>
+                <div className="font-mono text-sm mt-2">Mulai IDR 2.200K</div>
+              </div>
+            </div>
+            
+            <div className="bento-card col-span-6 lg:col-span-4 reveal" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+              <img src="https://picsum.photos/seed/komodo-bento/500/400.jpg" className="absolute inset-0 w-full h-full object-cover" alt="" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+              <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                <div className="font-mono text-xs text-white/60 mb-1">NTT</div>
+                <h3 className="font-display font-bold text-2xl">Labuan Bajo</h3>
+                <div className="font-mono text-xs mt-2">IDR 5.400K</div>
+              </div>
+            </div>
+            
+            <div className="bento-card col-span-6 lg:col-span-4 reveal" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+              <img src="https://picsum.photos/seed/bali-bento/500/400.jpg" className="absolute inset-0 w-full h-full object-cover" alt="" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+              <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                <div className="font-mono text-xs text-white/60 mb-1">BALI</div>
+                <h3 className="font-display font-bold text-2xl">Ubud & Sekitar</h3>
+                <div className="font-mono text-xs mt-2">IDR 1.500K</div>
+              </div>
+            </div>
+            
+            <div className="bento-card col-span-12 lg:col-span-4 reveal" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+              <img src="https://picsum.photos/seed/lombok-bento/500/400.jpg" className="absolute inset-0 w-full h-full object-cover" alt="" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+              <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                <div className="font-mono text-xs text-white/60 mb-1">NTB</div>
+                <h3 className="font-display font-bold text-2xl">Gili Trawangan</h3>
+                <div className="font-mono text-xs mt-2">IDR 1.800K</div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-[var(--border)] py-12 relative z-10">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[#7B8395]">
-            <div className="flex items-center gap-2.5">
-              <div className="relative w-7 h-7">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#FF6B4A] to-[#FFB845] rounded-lg rotate-45"></div>
-                <div className="absolute inset-1 bg-[#08111C] rounded-sm rotate-45"></div>
+      {/* Experiences (Tabs) */}
+      <section id="experiences" className="py-24 lg:py-32 relative">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-12 gap-12">
+            <div className="lg:col-span-4 reveal">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="w-12 h-px bg-[#1A1612]"></span>
+                <span className="section-num">004 — Pengalaman</span>
               </div>
-              <span className="font-display font-bold text-white">KelanaAI</span>
+              <h2 className="editorial-title mb-12">
+                Cara Anda<br/><em>menjelajah</em>.
+              </h2>
+              
+              <div className="space-y-2">
+                {['adventure', 'culture', 'culinary', 'wellness'].map(tab => (
+                  <button 
+                    key={tab}
+                    className={`tab-btn w-full text-left ${activeTab === tab ? 'active' : ''}`} 
+                    onClick={() => setActiveTab(tab)}
+                    onMouseEnter={handleCursorEnter} 
+                    onMouseLeave={handleCursorLeave}
+                  >
+                    <span className="dot"></span> {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                ))}
+              </div>
             </div>
-            <p>© 2026 KelanaAI · Plan your next adventure with AI</p>
-            <div className="flex flex-wrap gap-4 md:gap-6 mt-4 md:mt-0">
-              <a href="#" className="hover:text-white transition-colors">About Us</a>
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors">Contact</a>
+            
+            <div className="lg:col-span-8 reveal">
+              <div className="relative aspect-[4/3] rounded-3xl overflow-hidden mb-8 zoom-container" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+                <img src={activeTabData.img} className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" alt="" />
+                <div className="absolute top-6 right-6 glass-card px-4 py-2 rounded-full font-mono text-xs">
+                  {activeTab.toUpperCase()}
+                </div>
+              </div>
+              <h3 className="font-display text-4xl lg:text-5xl font-bold mb-4 leading-tight">{activeTabData.title}</h3>
+              <p className="text-[#6B5D4F] text-lg mb-8">{activeTabData.desc}</p>
+              <div className="grid grid-cols-2 gap-3">
+                {activeTabData.stats.map((s: string, idx: number) => (
+                  <div key={idx} className="flex items-center gap-3 bg-[#F4EFE6] rounded-2xl p-4">
+                    <div className="w-8 h-8 rounded-full bg-[#E85D2F]/10 text-[#E85D2F] flex items-center justify-center">
+                      <i className="fa-solid fa-check text-sm"></i>
+                    </div>
+                    <span className="font-medium text-sm">{s}</span>
+                  </div>
+                ))}
+              </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Editorial Quote / Stats */}
+      <section className="py-20 bg-[#0E4F4A] text-[#F4EFE6] relative overflow-hidden">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="reveal">
+              <i className="fa-solid fa-quote-left text-5xl text-[#E85D2F] mb-6"></i>
+              <p className="font-display text-3xl lg:text-4xl font-light italic leading-tight mb-8">
+                "Kami percaya pariwisata terbaik adalah yang menguntungkan penduduk lokal, bukan rantai hotel internasional."
+              </p>
+              <div className="flex items-center gap-4">
+                <img src="https://picsum.photos/seed/founder/100/100.jpg" className="w-12 h-12 rounded-full object-cover" alt="" />
+                <div>
+                  <div className="font-semibold">Bima Satria</div>
+                  <div className="text-sm text-[#F4EFE6]/60 font-mono">FOUNDER, LOKA</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-8 reveal">
+              <div className="border-l border-[#F4EFE6]/30 pl-6">
+                <div className="font-display font-black text-6xl mb-2">12K+</div>
+                <div className="text-[#F4EFE6]/60">Pelancong senang</div>
+              </div>
+              <div className="border-l border-[#F4EFE6]/30 pl-6">
+                <div className="font-display font-black text-6xl mb-2">86</div>
+                <div className="text-[#F4EFE6]/60">Destinasi aktif</div>
+              </div>
+              <div className="border-l border-[#F4EFE6]/30 pl-6">
+                <div className="font-display font-black text-6xl mb-2">248</div>
+                <div className="text-[#F4EFE6]/60">Trip tersusun</div>
+              </div>
+              <div className="border-l border-[#F4EFE6]/30 pl-6">
+                <div className="font-display font-black text-6xl mb-2">34</div>
+                <div className="text-[#F4EFE6]/60">Pemandu lokal</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Journal / Stories */}
+      <section id="journal" className="py-24 lg:py-32">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-16 reveal">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="w-12 h-px bg-[#1A1612]"></span>
+                <span className="section-num">005 — Jurnal</span>
+              </div>
+              <h2 className="editorial-title">
+                Cerita <em>pelancong</em>.
+              </h2>
+            </div>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <article className="reveal group cursor-none" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+              <div className="overflow-hidden rounded-3xl mb-4 aspect-[3/4]">
+                <img src="https://picsum.photos/seed/story1/400/500.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
+              </div>
+              <div className="flex items-center gap-2 mb-2 font-mono text-xs text-[#6B5D4F]">
+                <span>LABUAN BAJO</span> · <span>5 MIN BACA</span>
+              </div>
+              <h3 className="font-display font-bold text-2xl leading-tight group-hover:text-[#E85D2F] transition-colors">Pagi yang tak terlupakan di Pulau Padar</h3>
+              <p className="text-[#6B5D4F] mt-2">Bagaimana mendaki di kegelapan subuh membawa saya pada pemandangan terbaik seumur hidup.</p>
+            </article>
+            
+            <article className="reveal group cursor-none" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+              <div className="overflow-hidden rounded-3xl mb-4 aspect-[3/4]">
+                <img src="https://picsum.photos/seed/story2/400/500.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
+              </div>
+              <div className="flex items-center gap-2 mb-2 font-mono text-xs text-[#6B5D4F]">
+                <span>BROMO</span> · <span>8 MIN BACA</span>
+              </div>
+              <h3 className="font-display font-bold text-2xl leading-tight group-hover:text-[#E85D2F] transition-colors">Mitos dan kawah Tengger yang masih hidup</h3>
+              <p className="text-[#6B5D4F] mt-2">Sebuah perjalanan spiritual menyusuri desa-desa di kaki gunung berapi paling ikonik Indonesia.</p>
+            </article>
+            
+            <article className="reveal group cursor-none" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+              <div className="overflow-hidden rounded-3xl mb-4 aspect-[3/4]">
+                <img src="https://picsum.photos/seed/story3/400/500.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
+              </div>
+              <div className="flex items-center gap-2 mb-2 font-mono text-xs text-[#6B5D4F]">
+                <span>RAJA AMPAT</span> · <span>6 MIN BACA</span>
+              </div>
+              <h3 className="font-display font-bold text-2xl leading-tight group-hover:text-[#E85D2F] transition-colors">Hidup di atas air selama empat hari</h3>
+              <p className="text-[#6B5D4F] mt-2">Pengalaman tinggal di homestay apung dan menyelam di terumbu paling kaya di dunia.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-24 lg:py-32 bg-[#1A1612] text-[#F4EFE6] relative overflow-hidden">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 text-center relative z-10">
+          <div className="flex items-center justify-center gap-3 mb-8 reveal">
+            <span className="w-12 h-px bg-[#F4EFE6]"></span>
+            <span className="font-mono text-xs tracking-widest">SAATNYA BERANGKAT</span>
+            <span className="w-12 h-px bg-[#F4EFE6]"></span>
+          </div>
+          <h2 className="font-display font-black text-6xl lg:text-9xl leading-none tracking-tight mb-8 reveal">
+            Loka<span className="text-[#E85D2F]">.</span><br/>
+            <em className="font-light italic">Selalu menunggu.</em>
+          </h2>
+          <p className="text-lg text-[#F4EFE6]/60 max-w-xl mx-auto mb-12 reveal">
+            Berlangganan buletin kami untuk mendapatkan inspirasi perjalanan bulanan dan kode promo eksklusif.
+          </p>
+          
+          <form 
+            onSubmit={(e) => { e.preventDefault(); showToast('Berlangganan berhasil', 'Email inspirasi bulanan akan segera tiba.'); }} 
+            className="flex max-w-md mx-auto gap-2 reveal"
+          >
+            <input 
+              type="email" 
+              placeholder="email@anda.com" 
+              required
+              className="flex-1 bg-transparent border border-[#F4EFE6]/30 rounded-full px-6 py-4 outline-none focus:border-[#E85D2F] transition-colors placeholder-[#F4EFE6]/40" 
+              onMouseEnter={handleCursorEnter} 
+              onMouseLeave={handleCursorLeave}
+            />
+            <button 
+              type="submit" 
+              className="bg-[#E85D2F] hover:bg-[#C8431C] text-white px-8 py-4 rounded-full font-semibold transition-colors"
+              onMouseEnter={handleCursorEnter} 
+              onMouseLeave={handleCursorLeave}
+            >
+              Berlangganan
+            </button>
+          </form>
+        </div>
+        
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-[#E85D2F]/10 blur-3xl"></div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-[#1A1612] text-[#F4EFE6]/60 pt-16 pb-8 border-t border-[#F4EFE6]/10">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+          <div className="grid md:grid-cols-4 gap-8 mb-12">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <img src="/logo-kelanaai.png" alt="Loka Logo" className="w-8 h-8 object-contain" />
+                <span className="font-display text-xl font-black text-[#F4EFE6] tracking-tight">Loka<span className="text-[#E85D2F]">.</span></span>
+              </div>
+              <p className="text-sm">Perjalanan yang dirancang oleh orang yang pulang ke rumah.</p>
+            </div>
+            <div>
+              <h4 className="text-[#F4EFE6] font-semibold mb-4 text-sm">Destinasi</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Bali</a></li>
+                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Labuan Bajo</a></li>
+                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Raja Ampat</a></li>
+                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Bromo</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-[#F4EFE6] font-semibold mb-4 text-sm">Perusahaan</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Tentang kami</a></li>
+                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Karir</a></li>
+                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Blog</a></li>
+                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Kontak</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-[#F4EFE6] font-semibold mb-4 text-sm">Ikuti</h4>
+              <div className="flex gap-3">
+                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+                  <i className="fa-brands fa-instagram"></i>
+                </a>
+                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+                  <i className="fa-brands fa-tiktok"></i>
+                </a>
+                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+                  <i className="fa-brands fa-youtube"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div className="pt-8 border-t border-[#F4EFE6]/10 text-sm flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>© 2026 KelanaAI / Loka Travel. Dibuat dengan rindu di Indonesia.</div>
+            <div className="font-mono text-xs">DESIGN BY GPT-4O & ANTIGRAVITY</div>
           </div>
         </div>
       </footer>
 
       {/* Toast Notification */}
       <div 
-        className={`fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-[#142236] border border-[var(--border-2)] rounded-full text-sm transition-all duration-300 z-[100] flex items-center gap-3 ${toastMsg ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
+        id="toast"
+        className="fixed bottom-8 right-8 bg-[#1A1612] text-[#F4EFE6] p-4 px-6 rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.2)] z-[1000] flex items-center gap-4 max-w-[350px] transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+        style={{ transform: toastMsg.visible ? 'translateY(0)' : 'translateY(150%)' }}
       >
-        <i className="fa-solid fa-circle-check text-[#4ADBC8]"></i>
-        <span>{toastMsg}</span>
+        <div className="w-8 h-8 rounded-full bg-[#E85D2F] flex items-center justify-center flex-shrink-0">
+          <i className="fa-solid fa-check text-sm"></i>
+        </div>
+        <div>
+          <div className="font-semibold text-sm">{toastMsg.title}</div>
+          <div className="text-xs text-[#F4EFE6]/60">{toastMsg.msg}</div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

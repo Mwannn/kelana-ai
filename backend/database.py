@@ -9,7 +9,7 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/kelana_ai")
 
 # engine = the connection pool
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, connect_args={'client_encoding': 'utf8'})
 
 # SessionLocal = a factory for DB sessions
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

@@ -275,10 +275,12 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             
-            <div className="reveal flex flex-col">
+            <div className="reveal flex flex-col relative z-10">
+              {/* Ambient Glow behind image */}
+              <div className="absolute top-10 left-10 w-64 h-64 bg-cyan-500/30 rounded-full blur-[80px] pointer-events-none"></div>
               {/* Hero Destination Image */}
-              <div className="mb-8 rounded-2xl overflow-hidden shadow-2xl shadow-cyan-500/10 border border-white/10 relative h-64 sm:h-72 lg:h-80 w-full group">
-                <img src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Beautiful Alpine Destination" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              <div className="mb-8 rounded-[2rem] overflow-hidden shadow-[0_0_40px_-10px_rgba(74,219,200,0.3)] ring-1 ring-white/10 relative h-64 sm:h-72 lg:h-80 w-full group transition-all duration-700 hover:shadow-[0_0_60px_-15px_rgba(74,219,200,0.5)] hover:ring-white/30">
+                <img src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Beautiful Alpine Destination" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#08111C] via-transparent to-transparent opacity-80"></div>
                 <div className="absolute bottom-5 left-6 right-6 flex justify-between items-end">
                   <div>
@@ -295,10 +297,10 @@ export default function Home() {
                 <span className="pulse-dot"></span>
                 AI Trip Planner · v2.0
               </div>
-              <h1 className="font-display font-bold text-[clamp(3rem,8vw,7rem)] leading-[0.92] tracking-tight hero-title">
-                <span className="text-stroke">Plan</span> your<br/>
+              <h1 className="font-display font-bold text-[clamp(3.5rem,8vw,7.5rem)] leading-[0.9] tracking-tight hero-title relative z-10">
+                <span className="text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">Plan</span> your<br/>
                 next <span className="gradient-text">adventure</span><br/>
-                with <span className="italic font-light">AI.</span>
+                <span className="text-white/40 font-light italic">with</span> <span className="italic font-light text-white">AI.</span>
               </h1>
               <p className="mt-8 text-lg lg:text-xl text-[#7B8395] max-w-xl">
                 Tell us where, when, and how you love to travel. KelanaAI crafts a personalized itinerary in seconds — built around your budget, your style, your pace.
@@ -310,9 +312,10 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="reveal" style={{ transitionDelay: '0.15s' }}>
-              <div className="glass-strong p-7 lg:p-9 relative">
-                <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-[#FF6B4A] to-transparent"></div>
+            <div className="reveal relative group" style={{ transitionDelay: '0.15s' }}>
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#FF6B4A] via-[#FFB845] to-[#4ADBC8] rounded-[2.5rem] blur-2xl opacity-10 group-hover:opacity-30 transition duration-1000 group-hover:duration-300"></div>
+              <div className="glass-strong p-7 lg:p-10 relative rounded-[2rem] border border-white/10">
+                <div className="absolute top-0 left-10 right-10 h-[2px] bg-gradient-to-r from-transparent via-[#FF6B4A] to-transparent opacity-80"></div>
                 <div className="flex items-center justify-between mb-7">
                   <div>
                     <h2 className="font-display text-2xl font-bold">Plan Your Trip</h2>
@@ -397,19 +400,22 @@ export default function Home() {
 
                   {error && <div className="text-red-400 text-sm">{error}</div>}
 
-                  <button type="submit" disabled={loading} className="btn-primary w-full flex items-center justify-center gap-2.5 mt-2">
-                    {loading ? (
-                       <span className="flex items-center gap-2">
-                         <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                         Crafting itinerary...
-                       </span>
-                    ) : (
-                      <>
-                        <i className="fa-solid fa-wand-magic-sparkles"></i>
-                        Generate AI Trip
-                        <i className="fa-solid fa-arrow-right text-xs"></i>
-                      </>
-                    )}
+                  <button type="submit" disabled={loading} className="btn-primary w-full flex items-center justify-center gap-2.5 mt-6 relative overflow-hidden group/btn shadow-[0_0_20px_rgba(255,107,74,0.2)] hover:shadow-[0_0_40px_rgba(255,107,74,0.6)]">
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-[100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+                    <span className="relative z-10 flex items-center gap-2.5">
+                      {loading ? (
+                         <>
+                           <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                           Crafting itinerary...
+                         </>
+                      ) : (
+                        <>
+                          <i className="fa-solid fa-wand-magic-sparkles"></i>
+                          Generate AI Trip
+                          <i className="fa-solid fa-arrow-right text-xs"></i>
+                        </>
+                      )}
+                    </span>
                   </button>
                 </form>
               </div>

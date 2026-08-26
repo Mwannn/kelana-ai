@@ -227,7 +227,7 @@
   }
 
   .planner-card::before {
-    content: 'LOKA';
+    content: 'KELANA AI';
     position: absolute;
     bottom: -20px;
     right: -20px;
@@ -363,6 +363,82 @@
   .markdown-content h4 { font-weight: 600; margin-top: 1rem; margin-bottom: 0.25rem; color: var(--fg); }
   
   .zoom-container { overflow: hidden; }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in {
+    animation: fade-in 0.8s ease forwards;
+  }
+
+  /* 404 Page Styles */
+  @keyframes shake-slow {
+    0%, 100% { transform: rotate(-2deg); }
+    50% { transform: rotate(2deg); }
+  }
+  
+  @keyframes pulse-compass {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-15deg) scale(1.1); }
+    75% { transform: rotate(15deg) scale(1.1); }
+  }
+  
+  .compass-icon {
+    animation: pulse-compass 4s ease-in-out infinite;
+  }
+  
+  .error-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(8rem, 25vw, 22rem);
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+  }
+  
+  .error-title em {
+    font-weight: 300;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+  }
+  
+  .btn-outline {
+    border: 1.5px solid var(--fg);
+    color: var(--fg);
+    background: transparent;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-outline:hover {
+    background: var(--fg);
+    color: var(--bg);
+  }
+  
+  .dest-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .dest-card img {
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .dest-card:hover img { transform: scale(1.1); }
+  .dest-card:hover .card-overlay { opacity: 1; }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+  }
+  
+  .float-card {
+    animation: shake-slow 6s ease-in-out infinite;
+  }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {

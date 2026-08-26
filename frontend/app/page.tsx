@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import Link from 'next/link';
 
 export default function Home() {
   const [destination, setDestination] = useState('Jakarta Pusat Johar');
   const [budget, setBudget] = useState('15000000');
+  const [currency, setCurrency] = useState('IDR');
   const [days, setDays] = useState('7');
   const [travelStyle, setTravelStyle] = useState('budget');
   const [language, setLanguage] = useState('Indonesian');
@@ -16,39 +18,34 @@ export default function Home() {
   const [toastMsg, setToastMsg] = useState({ title: '', msg: '', visible: false });
   const [activeTab, setActiveTab] = useState('adventure');
   
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
-  const [ringPos, setRingPos] = useState({ x: 0, y: 0 });
-  const [cursorHover, setCursorHover] = useState(false);
-  
-  const requestRef = useRef<number>();
+  const [testiIdx, setTestiIdx] = useState(0);
+  const testimonials = [
+    {
+      quote: "Kami percaya pariwisata terbaik adalah yang menguntungkan penduduk lokal, bukan rantai hotel internasional.",
+      name: "Marwan Wisnu",
+      role: "FOUNDER, KELANA AI",
+      img: "https://ui-avatars.com/api/?name=Marwan+Wisnu&background=E85D2F&color=F4EFE6&size=100&bold=true"
+    },
+    {
+      quote: "Itinerary dari AI ini sangat detail! Kami menemukan kedai kopi tersembunyi yang bahkan turis lain tidak tahu.",
+      name: "Sarah L.",
+      role: "PELANCONG, JAKARTA",
+      img: "https://ui-avatars.com/api/?name=Sarah+L&background=1A1612&color=F4EFE6&size=100&bold=true"
+    },
+    {
+      quote: "Sangat mudah digunakan. Perjalanan ke Raja Ampat menjadi jauh lebih terorganisir dan sesuai dengan budget yang saya miliki.",
+      name: "Andi Pratama",
+      role: "DIGITAL NOMAD",
+      img: "https://ui-avatars.com/api/?name=Andi+Pratama&background=0E4F4A&color=F4EFE6&size=100&bold=true"
+    }
+  ];
 
-  // Custom Cursor Logic
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setCursorPos({ x: e.clientX, y: e.clientY });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-
-    const animateRing = () => {
-      setRingPos((prev) => {
-        const dx = cursorPos.x - prev.x;
-        const dy = cursorPos.y - prev.y;
-        return {
-          x: prev.x + dx * 0.15,
-          y: prev.y + dy * 0.15,
-        };
-      });
-      requestRef.current = requestAnimationFrame(animateRing);
-    };
-
-    requestRef.current = requestAnimationFrame(animateRing);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (requestRef.current) cancelAnimationFrame(requestRef.current);
-    };
-  }, [cursorPos]);
+    const timer = setInterval(() => {
+      setTestiIdx(prev => (prev + 1) % testimonials.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Observer for Reveal animations
   useEffect(() => {
@@ -71,8 +68,7 @@ export default function Home() {
     }, 3500);
   };
 
-  const handleCursorEnter = () => setCursorHover(true);
-  const handleCursorLeave = () => setCursorHover(false);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +84,7 @@ export default function Home() {
         body: JSON.stringify({
           destination,
           budget: parseFloat(budget),
-          currency: 'IDR',
+          currency: currency,
           days: parseInt(days, 10),
           travel_style: travelStyle,
         }),
@@ -147,31 +143,21 @@ export default function Home() {
 
   return (
     <>
-      <div 
-        className="cursor-dot hidden md:block" 
-        style={{ transform: `translate(${cursorPos.x - 3}px, ${cursorPos.y - 3}px)` }}
-      ></div>
-      <div 
-        className={`cursor-ring hidden md:block ${cursorHover ? 'cursor-hover' : ''}`} 
-        style={{ left: `${ringPos.x}px`, top: `${ringPos.y}px` }}
-      ></div>
-
       {/* Navigation */}
       <nav className="nav-glass fixed top-0 left-0 right-0 z-50">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-2" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
-            <img src="/logo-kelanaai.png" alt="Loka Logo" className="w-8 h-8 object-contain" />
-            <span className="font-display text-xl font-black tracking-tight">Loka<span className="text-[#E85D2F]">.</span></span>
+          <a href="#" className="flex items-center gap-2"  >
+            <img src="/logo-kelanaai.png" alt="Kelana AI Logo" className="h-12 w-auto object-contain" />
           </a>
           <div className="hidden lg:flex items-center gap-8 text-sm font-medium">
-            <a href="#destinations" className="hover:text-[#E85D2F] transition-colors" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Destinasi</a>
-            <a href="#planner" className="hover:text-[#E85D2F] transition-colors" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Buat Trip</a>
-            <a href="#experiences" className="hover:text-[#E85D2F] transition-colors" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Pengalaman</a>
-            <a href="#journal" className="hover:text-[#E85D2F] transition-colors" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Jurnal</a>
+            <a href="#destinations" className="hover:text-[#E85D2F] transition-colors"  >Destinasi</a>
+            <a href="#planner" className="hover:text-[#E85D2F] transition-colors"  >Buat Trip</a>
+            <a href="#experiences" className="hover:text-[#E85D2F] transition-colors"  >Pengalaman</a>
+            <a href="#journal" className="hover:text-[#E85D2F] transition-colors"  >Jurnal</a>
           </div>
           <div className="flex items-center gap-3">
-            <button className="hidden md:block text-sm font-medium" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Masuk</button>
-            <button className="btn-primary px-5 py-2.5 rounded-full text-sm font-semibold" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+            <Link href="/masuk" className="hidden md:block text-sm font-medium cursor-hover-target">Masuk</Link>
+            <button className="btn-primary px-5 py-2.5 rounded-full text-sm font-semibold cursor-hover-target">
               <span>Mulai Perjalanan</span>
             </button>
           </div>
@@ -315,23 +301,31 @@ export default function Home() {
                       onChange={e => setDestination(e.target.value)}
                       required
                       className="input-line" 
-                      onMouseEnter={handleCursorEnter} 
-                      onMouseLeave={handleCursorLeave}
+                       
+                      
                     />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <label className="font-mono text-xs uppercase tracking-widest text-[#6B5D4F]">Budget (IDR)</label>
-                      <input 
-                        type="number" 
-                        value={budget} 
-                        onChange={e => setBudget(e.target.value)}
-                        required
-                        className="input-line" 
-                        onMouseEnter={handleCursorEnter} 
-                        onMouseLeave={handleCursorLeave}
-                      />
+                      <label className="font-mono text-xs uppercase tracking-widest text-[#6B5D4F] mb-1 block">Budget</label>
+                      <div className="flex items-center gap-3">
+                        <select 
+                          className="bg-transparent border-b border-[#1A1612]/20 text-[#1A1612] py-2 font-mono text-sm focus:outline-none focus:border-[#E85D2F] cursor-hover-target"
+                          value={currency}
+                          onChange={(e) => setCurrency(e.target.value)}
+                        >
+                          <option value="IDR">IDR</option>
+                          <option value="USD">USD</option>
+                        </select>
+                        <input 
+                          type="text" 
+                          value={budget ? new Intl.NumberFormat(currency === 'IDR' ? 'id-ID' : 'en-US').format(Number(budget)) : ''} 
+                          onChange={e => setBudget(e.target.value.replace(/\D/g, ''))}
+                          required
+                          className="input-line w-full cursor-hover-target" 
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="font-mono text-xs uppercase tracking-widest text-[#6B5D4F]">Durasi (Hari)</label>
@@ -341,8 +335,8 @@ export default function Home() {
                         onChange={e => setDays(e.target.value)}
                         required
                         className="input-line" 
-                        onMouseEnter={handleCursorEnter} 
-                        onMouseLeave={handleCursorLeave}
+                         
+                        
                       />
                     </div>
                   </div>
@@ -356,8 +350,8 @@ export default function Home() {
                           type="button"
                           onClick={() => setTravelStyle(style)}
                           className={`style-tag ${travelStyle === style ? 'active' : ''}`}
-                          onMouseEnter={handleCursorEnter} 
-                          onMouseLeave={handleCursorLeave}
+                           
+                          
                         >
                           {style.charAt(0).toUpperCase() + style.slice(1)}
                         </button>
@@ -372,8 +366,8 @@ export default function Home() {
                       onChange={e => setLanguage(e.target.value)}
                       className="input-line" 
                       style={{ appearance: 'none', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%231A1612' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right center' }}
-                      onMouseEnter={handleCursorEnter} 
-                      onMouseLeave={handleCursorLeave}
+                       
+                      
                     >
                       <option value="Indonesian">Indonesian</option>
                       <option value="English">English</option>
@@ -385,9 +379,7 @@ export default function Home() {
                   <button 
                     type="submit" 
                     disabled={loading}
-                    className="btn-primary w-full py-4 rounded-full font-bold text-base mt-4 flex items-center justify-center gap-3"
-                    onMouseEnter={handleCursorEnter} 
-                    onMouseLeave={handleCursorLeave}
+                    className="btn-primary w-full py-4 rounded-full font-bold text-base mt-4 flex items-center justify-center gap-3 cursor-hover-target"
                   >
                     <span className="flex items-center gap-3">
                       {loading ? 'Menyusun Itinerary...' : 'Generate AI Trip'}
@@ -416,9 +408,9 @@ export default function Home() {
                         <h4 className="font-display text-2xl font-bold">{tripData.destination}</h4>
                       </div>
                       <div className="text-right">
-                        <div class="font-mono text-xs text-[#6B5D4F] mb-1">ESTIMASI</div>
+                        <div className="font-mono text-xs text-[#6B5D4F] mb-1">ESTIMASI</div>
                         <div className="font-display text-xl font-bold text-[#E85D2F]">
-                          {tripData.currency === 'IDR' ? 'Rp' : '$'} {Number(tripData.budget).toLocaleString('id-ID')}
+                          {tripData.currency === 'IDR' ? 'Rp' : '$'} {Number(tripData.budget).toLocaleString(tripData.currency === 'IDR' ? 'id-ID' : 'en-US')}
                         </div>
                       </div>
                     </div>
@@ -461,7 +453,7 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-12 gap-4 lg:gap-6 auto-rows-[240px]">
-            <div className="bento-card col-span-12 lg:col-span-8 row-span-2 reveal" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+            <Link href="#bromo" className="bento-card block col-span-12 lg:col-span-8 row-span-2 reveal cursor-hover-target">
               <img src="https://picsum.photos/seed/bromo-bento/900/700.jpg" className="absolute inset-0 w-full h-full object-cover" alt="" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
               <div className="absolute inset-0 p-8 flex flex-col justify-end text-white">
@@ -471,65 +463,65 @@ export default function Home() {
                 <div className="flex items-end justify-between">
                   <div>
                     <div className="font-mono text-xs text-white/60 mb-2">JAWA TIMUR</div>
-                    <h3 className="font-display font-black text-4xl lg:text-6xl leading-none">Bromo Tengger</h3>
+                    <h3 className="font-display font-black text-4xl lg:text-6xl leading-none group-hover:text-[#E85D2F] transition-colors">Bromo Tengger</h3>
                     <div className="mt-3 font-mono text-sm">Mulai IDR 1.850K · 3 Hari</div>
                   </div>
-                  <div className="w-12 h-12 rounded-full bg-[#E85D2F] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-[#E85D2F] flex items-center justify-center transition-transform hover:scale-110">
                     <i className="fa-solid fa-arrow-right text-white"></i>
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
             
-            <div className="bento-card col-span-12 sm:col-span-6 lg:col-span-4 reveal" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+            <Link href="#raja-ampat" className="bento-card block col-span-12 sm:col-span-6 lg:col-span-4 reveal cursor-hover-target">
               <img src="https://picsum.photos/seed/raja-bento/600/400.jpg" className="absolute inset-0 w-full h-full object-cover" alt="" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
               <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
                 <div className="font-mono text-xs text-white/60 mb-1">PAPUA BARAT DAYA</div>
-                <h3 className="font-display font-bold text-3xl">Raja Ampat</h3>
+                <h3 className="font-display font-bold text-3xl group-hover:text-[#E85D2F] transition-colors">Raja Ampat</h3>
                 <div className="font-mono text-sm mt-2">Mulai IDR 8.500K</div>
               </div>
-            </div>
+            </Link>
             
-            <div className="bento-card col-span-12 sm:col-span-6 lg:col-span-4 reveal" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+            <Link href="#toba" className="bento-card block col-span-12 sm:col-span-6 lg:col-span-4 reveal cursor-hover-target">
               <img src="https://picsum.photos/seed/toba-bento/600/400.jpg" className="absolute inset-0 w-full h-full object-cover" alt="" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
               <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
                 <div className="font-mono text-xs text-white/60 mb-1">SUMATERA UTARA</div>
-                <h3 className="font-display font-bold text-3xl">Danau Toba</h3>
+                <h3 className="font-display font-bold text-3xl group-hover:text-[#E85D2F] transition-colors">Danau Toba</h3>
                 <div className="font-mono text-sm mt-2">Mulai IDR 2.200K</div>
               </div>
-            </div>
+            </Link>
             
-            <div className="bento-card col-span-6 lg:col-span-4 reveal" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+            <Link href="#labuan-bajo" className="bento-card block col-span-6 lg:col-span-4 reveal cursor-hover-target">
               <img src="https://picsum.photos/seed/komodo-bento/500/400.jpg" className="absolute inset-0 w-full h-full object-cover" alt="" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
               <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
                 <div className="font-mono text-xs text-white/60 mb-1">NTT</div>
-                <h3 className="font-display font-bold text-2xl">Labuan Bajo</h3>
+                <h3 className="font-display font-bold text-2xl group-hover:text-[#E85D2F] transition-colors">Labuan Bajo</h3>
                 <div className="font-mono text-xs mt-2">IDR 5.400K</div>
               </div>
-            </div>
+            </Link>
             
-            <div className="bento-card col-span-6 lg:col-span-4 reveal" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+            <Link href="#ubud" className="bento-card block col-span-6 lg:col-span-4 reveal cursor-hover-target">
               <img src="https://picsum.photos/seed/bali-bento/500/400.jpg" className="absolute inset-0 w-full h-full object-cover" alt="" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
               <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
                 <div className="font-mono text-xs text-white/60 mb-1">BALI</div>
-                <h3 className="font-display font-bold text-2xl">Ubud & Sekitar</h3>
+                <h3 className="font-display font-bold text-2xl group-hover:text-[#E85D2F] transition-colors">Ubud & Sekitar</h3>
                 <div className="font-mono text-xs mt-2">IDR 1.500K</div>
               </div>
-            </div>
+            </Link>
             
-            <div className="bento-card col-span-12 lg:col-span-4 reveal" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+            <Link href="#gili" className="bento-card block col-span-12 lg:col-span-4 reveal cursor-hover-target">
               <img src="https://picsum.photos/seed/lombok-bento/500/400.jpg" className="absolute inset-0 w-full h-full object-cover" alt="" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
               <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
                 <div className="font-mono text-xs text-white/60 mb-1">NTB</div>
-                <h3 className="font-display font-bold text-2xl">Gili Trawangan</h3>
+                <h3 className="font-display font-bold text-2xl group-hover:text-[#E85D2F] transition-colors">Gili Trawangan</h3>
                 <div className="font-mono text-xs mt-2">IDR 1.800K</div>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </section>
@@ -553,8 +545,8 @@ export default function Home() {
                     key={tab}
                     className={`tab-btn w-full text-left ${activeTab === tab ? 'active' : ''}`} 
                     onClick={() => setActiveTab(tab)}
-                    onMouseEnter={handleCursorEnter} 
-                    onMouseLeave={handleCursorLeave}
+                     
+                    
                   >
                     <span className="dot"></span> {tab.charAt(0).toUpperCase() + tab.slice(1)}
                   </button>
@@ -563,7 +555,7 @@ export default function Home() {
             </div>
             
             <div className="lg:col-span-8 reveal">
-              <div className="relative aspect-[4/3] rounded-3xl overflow-hidden mb-8 zoom-container" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+              <div className="relative aspect-[4/3] rounded-3xl overflow-hidden mb-8 zoom-container"  >
                 <img src={activeTabData.img} className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" alt="" />
                 <div className="absolute top-6 right-6 glass-card px-4 py-2 rounded-full font-mono text-xs">
                   {activeTab.toUpperCase()}
@@ -590,16 +582,18 @@ export default function Home() {
       <section className="py-20 bg-[#0E4F4A] text-[#F4EFE6] relative overflow-hidden">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="reveal">
+            <div className="reveal min-h-[300px] flex flex-col justify-center">
               <i className="fa-solid fa-quote-left text-5xl text-[#E85D2F] mb-6"></i>
-              <p className="font-display text-3xl lg:text-4xl font-light italic leading-tight mb-8">
-                "Kami percaya pariwisata terbaik adalah yang menguntungkan penduduk lokal, bukan rantai hotel internasional."
-              </p>
-              <div className="flex items-center gap-4">
-                <img src="https://picsum.photos/seed/founder/100/100.jpg" className="w-12 h-12 rounded-full object-cover" alt="" />
-                <div>
-                  <div className="font-semibold">Bima Satria</div>
-                  <div className="text-sm text-[#F4EFE6]/60 font-mono">FOUNDER, LOKA</div>
+              <div key={testiIdx} className="animate-fade-in">
+                <p className="font-display text-3xl lg:text-4xl font-light italic leading-tight mb-8">
+                  "{testimonials[testiIdx].quote}"
+                </p>
+                <div className="flex items-center gap-4">
+                  <img src={testimonials[testiIdx].img} className="w-12 h-12 rounded-full object-cover shadow-lg" alt="" />
+                  <div>
+                    <div className="font-semibold">{testimonials[testiIdx].name}</div>
+                    <div className="text-sm text-[#F4EFE6]/60 font-mono">{testimonials[testiIdx].role}</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -642,38 +636,44 @@ export default function Home() {
           </div>
           
           <div className="grid md:grid-cols-3 gap-6">
-            <article className="reveal group cursor-none" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
-              <div className="overflow-hidden rounded-3xl mb-4 aspect-[3/4]">
-                <img src="https://picsum.photos/seed/story1/400/500.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
-              </div>
-              <div className="flex items-center gap-2 mb-2 font-mono text-xs text-[#6B5D4F]">
-                <span>LABUAN BAJO</span> · <span>5 MIN BACA</span>
-              </div>
-              <h3 className="font-display font-bold text-2xl leading-tight group-hover:text-[#E85D2F] transition-colors">Pagi yang tak terlupakan di Pulau Padar</h3>
-              <p className="text-[#6B5D4F] mt-2">Bagaimana mendaki di kegelapan subuh membawa saya pada pemandangan terbaik seumur hidup.</p>
-            </article>
+            <Link href="/journal/pagi-yang-tak-terlupakan-di-pulau-padar" className="reveal group cursor-none block"  >
+              <article>
+                <div className="overflow-hidden rounded-3xl mb-4 aspect-[3/4]">
+                  <img src="https://picsum.photos/seed/story1/400/500.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
+                </div>
+                <div className="flex items-center gap-2 mb-2 font-mono text-xs text-[#6B5D4F]">
+                  <span>LABUAN BAJO</span> · <span>5 MIN BACA</span>
+                </div>
+                <h3 className="font-display font-bold text-2xl leading-tight group-hover:text-[#E85D2F] transition-colors">Pagi yang tak terlupakan di Pulau Padar</h3>
+                <p className="text-[#6B5D4F] mt-2">Bagaimana mendaki di kegelapan subuh membawa saya pada pemandangan terbaik seumur hidup.</p>
+              </article>
+            </Link>
             
-            <article className="reveal group cursor-none" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
-              <div className="overflow-hidden rounded-3xl mb-4 aspect-[3/4]">
-                <img src="https://picsum.photos/seed/story2/400/500.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
-              </div>
-              <div className="flex items-center gap-2 mb-2 font-mono text-xs text-[#6B5D4F]">
-                <span>BROMO</span> · <span>8 MIN BACA</span>
-              </div>
-              <h3 className="font-display font-bold text-2xl leading-tight group-hover:text-[#E85D2F] transition-colors">Mitos dan kawah Tengger yang masih hidup</h3>
-              <p className="text-[#6B5D4F] mt-2">Sebuah perjalanan spiritual menyusuri desa-desa di kaki gunung berapi paling ikonik Indonesia.</p>
-            </article>
+            <Link href="/journal/mitos-dan-kawah-tengger" className="reveal group cursor-none block"  >
+              <article>
+                <div className="overflow-hidden rounded-3xl mb-4 aspect-[3/4]">
+                  <img src="https://picsum.photos/seed/story2/400/500.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
+                </div>
+                <div className="flex items-center gap-2 mb-2 font-mono text-xs text-[#6B5D4F]">
+                  <span>BROMO</span> · <span>8 MIN BACA</span>
+                </div>
+                <h3 className="font-display font-bold text-2xl leading-tight group-hover:text-[#E85D2F] transition-colors">Mitos dan kawah Tengger yang masih hidup</h3>
+                <p className="text-[#6B5D4F] mt-2">Sebuah perjalanan spiritual menyusuri desa-desa di kaki gunung berapi paling ikonik Indonesia.</p>
+              </article>
+            </Link>
             
-            <article className="reveal group cursor-none" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
-              <div className="overflow-hidden rounded-3xl mb-4 aspect-[3/4]">
-                <img src="https://picsum.photos/seed/story3/400/500.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
-              </div>
-              <div className="flex items-center gap-2 mb-2 font-mono text-xs text-[#6B5D4F]">
-                <span>RAJA AMPAT</span> · <span>6 MIN BACA</span>
-              </div>
-              <h3 className="font-display font-bold text-2xl leading-tight group-hover:text-[#E85D2F] transition-colors">Hidup di atas air selama empat hari</h3>
-              <p className="text-[#6B5D4F] mt-2">Pengalaman tinggal di homestay apung dan menyelam di terumbu paling kaya di dunia.</p>
-            </article>
+            <Link href="/journal/hidup-di-atas-air-empat-hari" className="reveal group cursor-none block"  >
+              <article>
+                <div className="overflow-hidden rounded-3xl mb-4 aspect-[3/4]">
+                  <img src="https://picsum.photos/seed/story3/400/500.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
+                </div>
+                <div className="flex items-center gap-2 mb-2 font-mono text-xs text-[#6B5D4F]">
+                  <span>RAJA AMPAT</span> · <span>6 MIN BACA</span>
+                </div>
+                <h3 className="font-display font-bold text-2xl leading-tight group-hover:text-[#E85D2F] transition-colors">Hidup di atas air selama empat hari</h3>
+                <p className="text-[#6B5D4F] mt-2">Pengalaman tinggal di homestay apung dan menyelam di terumbu paling kaya di dunia.</p>
+              </article>
+            </Link>
           </div>
         </div>
       </section>
@@ -686,10 +686,10 @@ export default function Home() {
             <span className="font-mono text-xs tracking-widest">SAATNYA BERANGKAT</span>
             <span className="w-12 h-px bg-[#F4EFE6]"></span>
           </div>
-          <h2 className="font-display font-black text-6xl lg:text-9xl leading-none tracking-tight mb-8 reveal">
-            Loka<span className="text-[#E85D2F]">.</span><br/>
-            <em className="font-light italic">Selalu menunggu.</em>
-          </h2>
+          <div className="flex flex-col items-center justify-center gap-8 mb-8 reveal">
+            <img src="/logo-kelanaai.png" alt="Kelana AI Logo" className="h-28 md:h-36 lg:h-48 w-auto object-contain brightness-0 invert opacity-90" />
+            <em className="font-display font-light italic text-4xl lg:text-6xl text-[#F4EFE6]/90">Selalu menunggu.</em>
+          </div>
           <p className="text-lg text-[#F4EFE6]/60 max-w-xl mx-auto mb-12 reveal">
             Berlangganan buletin kami untuk mendapatkan inspirasi perjalanan bulanan dan kode promo eksklusif.
           </p>
@@ -703,14 +703,14 @@ export default function Home() {
               placeholder="email@anda.com" 
               required
               className="flex-1 bg-transparent border border-[#F4EFE6]/30 rounded-full px-6 py-4 outline-none focus:border-[#E85D2F] transition-colors placeholder-[#F4EFE6]/40" 
-              onMouseEnter={handleCursorEnter} 
-              onMouseLeave={handleCursorLeave}
+               
+              
             />
             <button 
               type="submit" 
               className="bg-[#E85D2F] hover:bg-[#C8431C] text-white px-8 py-4 rounded-full font-semibold transition-colors"
-              onMouseEnter={handleCursorEnter} 
-              onMouseLeave={handleCursorLeave}
+               
+              
             >
               Berlangganan
             </button>
@@ -726,47 +726,48 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <img src="/logo-kelanaai.png" alt="Loka Logo" className="w-8 h-8 object-contain" />
-                <span className="font-display text-xl font-black text-[#F4EFE6] tracking-tight">Loka<span className="text-[#E85D2F]">.</span></span>
+                <img src="/logo-kelanaai.png" alt="Kelana AI Logo" className="h-16 w-auto object-contain brightness-0 invert opacity-90" />
               </div>
               <p className="text-sm">Perjalanan yang dirancang oleh orang yang pulang ke rumah.</p>
             </div>
             <div>
               <h4 className="text-[#F4EFE6] font-semibold mb-4 text-sm">Destinasi</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Bali</a></li>
-                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Labuan Bajo</a></li>
-                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Raja Ampat</a></li>
-                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Bromo</a></li>
+                <li><a href="#" className="hover:text-[#E85D2F]"  >Bali</a></li>
+                <li><a href="#" className="hover:text-[#E85D2F]"  >Labuan Bajo</a></li>
+                <li><a href="#" className="hover:text-[#E85D2F]"  >Raja Ampat</a></li>
+                <li><a href="#" className="hover:text-[#E85D2F]"  >Bromo</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-[#F4EFE6] font-semibold mb-4 text-sm">Perusahaan</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Tentang kami</a></li>
-                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Karir</a></li>
-                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Blog</a></li>
-                <li><a href="#" className="hover:text-[#E85D2F]" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>Kontak</a></li>
+                <li><a href="#" className="hover:text-[#E85D2F]"  >Tentang kami</a></li>
+                <li><a href="#" className="hover:text-[#E85D2F]"  >Karir</a></li>
+                <li><a href="#" className="hover:text-[#E85D2F]"  >Blog</a></li>
+                <li><a href="#" className="hover:text-[#E85D2F]"  >Kontak</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-[#F4EFE6] font-semibold mb-4 text-sm">Ikuti</h4>
               <div className="flex gap-3">
-                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors"  >
                   <i className="fa-brands fa-instagram"></i>
                 </a>
-                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors"  >
                   <i className="fa-brands fa-tiktok"></i>
                 </a>
-                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors" onMouseEnter={handleCursorEnter} onMouseLeave={handleCursorLeave}>
+                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors"  >
                   <i className="fa-brands fa-youtube"></i>
                 </a>
               </div>
             </div>
           </div>
           <div className="pt-8 border-t border-[#F4EFE6]/10 text-sm flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>© 2026 KelanaAI / Loka Travel. Dibuat dengan rindu di Indonesia.</div>
-            <div className="font-mono text-xs">DESIGN BY GPT-4O & ANTIGRAVITY</div>
+            <div>© 2026 Kelana AI Travel. Dibuat dengan rindu di Indonesia.</div>
+            <div className="font-mono text-xs">
+              DESIGN BY <a href="https://marwan-wisnu.my.id/" target="_blank" rel="noopener noreferrer" className="hover:text-[#E85D2F] transition-colors underline decoration-[#F4EFE6]/30 hover:decoration-[#E85D2F]">mwannn_n</a>
+            </div>
           </div>
         </div>
       </footer>

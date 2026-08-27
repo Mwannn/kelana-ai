@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { generateTrip } from '../services/tripService';
 
 export default function Home() {
   const [destination, setDestination] = useState('Jakarta Pusat Johar');
@@ -68,7 +70,7 @@ export default function Home() {
     }, 3500);
   };
 
-
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,32 +80,17 @@ export default function Home() {
     setTripData(null);
 
     try {
-      const saveRes = await fetch('http://localhost:8000/api/v1/trips', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          destination,
-          budget: parseFloat(budget),
-          currency: currency,
-          days: parseInt(days, 10),
-          travel_style: travelStyle,
-        }),
+      const generatedTrip = await generateTrip({
+        destination,
+        budget: parseFloat(budget),
+        currency: currency,
+        days: parseInt(days, 10),
+        travel_style: travelStyle,
+        language
       });
-
-      if (!saveRes.ok) throw new Error('Failed to save trip');
-      const trip = await saveRes.json();
-
-      const genRes = await fetch(`http://localhost:8000/api/v1/trips/${trip.id}/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ travel_style: travelStyle, language }),
-      });
-
-      if (!genRes.ok) throw new Error('Failed to generate AI recommendation');
-      const generatedTrip = await genRes.json();
       
-      setTripData(generatedTrip);
       showToast('Trip berhasil dibuat!', `Itinerary ${days} hari di ${destination} siap.`);
+      router.push('/trips');
     } catch (err: any) {
       console.error(err);
       showToast('Gagal', 'Terjadi kesalahan saat membuat itinerary.');

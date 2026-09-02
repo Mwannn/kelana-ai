@@ -1,6 +1,9 @@
 import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
+from database import init_db
+import models.user # Ensure models are imported
+import models.trip
 
 # Load environment variables
 load_dotenv()
@@ -10,9 +13,14 @@ engine = create_engine(DATABASE_URL)
 
 try:
     with engine.connect() as conn:
-        print("Checking if 'currency' column exists...")
-        conn.execute(text("ALTER TABLE trips ADD COLUMN currency VARCHAR NOT NULL DEFAULT 'USD'"))
+        print("Dropping existing tables to apply Session 8 auth migrations...")
+        conn.execute(text("DROP TABLE IF EXISTS trips CASCADE"))
+        conn.execute(text("DROP TABLE IF EXISTS users CASCADE"))
         conn.commit()
-        print("Success! The 'currency' column has been added to your database.")
+        print("Success! Tables dropped.")
+    
+    print("Recreating tables...")
+    init_db()
+    print("Success! Database migration completed for Session 8.")
 except Exception as e:
-    print("Notice (Safe to ignore if column already exists):", e)
+    print("Migration failed:", e)

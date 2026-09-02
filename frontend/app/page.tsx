@@ -130,27 +130,6 @@ export default function Home() {
 
   return (
     <>
-      {/* Navigation */}
-      <nav className="nav-glass fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-2"  >
-            <img src="/logo-kelanaai.png" alt="Kelana AI Logo" className="h-12 w-auto object-contain" />
-          </a>
-          <div className="hidden lg:flex items-center gap-8 text-sm font-medium">
-            <a href="#destinations" className="hover:text-[#E85D2F] transition-colors"  >Destinasi</a>
-            <a href="#planner" className="hover:text-[#E85D2F] transition-colors"  >Buat Trip</a>
-            <a href="#experiences" className="hover:text-[#E85D2F] transition-colors"  >Pengalaman</a>
-            <a href="#journal" className="hover:text-[#E85D2F] transition-colors"  >Jurnal</a>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/masuk" className="hidden md:block text-sm font-medium cursor-hover-target">Masuk</Link>
-            <button className="btn-primary px-5 py-2.5 rounded-full text-sm font-semibold cursor-hover-target">
-              <span>Mulai Perjalanan</span>
-            </button>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero Section */}
       <section className="relative min-h-screen pt-28 pb-12 overflow-hidden">
         <div className="particle" style={{ top: '20%', left: '80%', width: '8px', height: '8px', animationDelay: '0s' }}></div>
@@ -402,7 +381,20 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 markdown-content text-sm">
-                      <ReactMarkdown>{tripData.ai_recommendation}</ReactMarkdown>
+                      <ReactMarkdown
+                        components={{
+                          code({ node, className, children, ...props }) {
+                            const content = String(children).trim();
+                            if (content.startsWith('icon:')) {
+                              const iconClass = content.replace('icon:', '').trim();
+                              return <i className={`${iconClass} text-[#E85D2F] mr-2`}></i>;
+                            }
+                            return <code className={className} {...props}>{children}</code>;
+                          }
+                        }}
+                      >
+                        {(tripData.ai_recommendation || "").replace(/icon:(fa-[a-z0-9-]+ fa-[a-z0-9-]+)/g, '`icon:$1`')}
+                      </ReactMarkdown>
                     </div>
                   </div>
                 )}

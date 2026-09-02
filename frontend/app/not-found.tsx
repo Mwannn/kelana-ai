@@ -48,17 +48,6 @@ export default function NotFound() {
 
   return (
     <div ref={containerRef} className="min-h-screen bg-[#F4EFE6] text-[#1A1612] font-sans">
-      {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 py-6 px-6 lg:px-12 flex items-center justify-between bg-[#F4EFE6]/80 backdrop-blur-md border-b border-[#1A1612]/5">
-        <Link href="/" className="flex items-center gap-2 cursor-hover-target">
-          <img src="/logo-kelanaai.png" alt="Kelana AI Logo" className="h-10 w-auto object-contain" />
-        </Link>
-        <Link href="/" className="font-mono text-xs uppercase tracking-widest flex items-center gap-2 hover:text-[#E85D2F] transition-colors cursor-hover-target">
-          <i className="fa-solid fa-arrow-left"></i>
-          Kembali ke Beranda
-        </Link>
-      </nav>
-
       {/* Main 404 Section */}
       <section className="min-h-screen pt-32 pb-12 relative overflow-hidden">
         <div className="particle" style={{ top: '20%', left: '80%', width: '8px', height: '8px', animationDelay: '0s' }}></div>

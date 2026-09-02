@@ -28,24 +28,26 @@ def generate_itinerary(destination: str, days: int, budget: float, travel_style:
     
     Provide a deeply comprehensive and structured response formatted beautifully in Markdown. Your response must include:
     
-    1. 📝 **Trip Overview**: A brief, inspiring summary of what to expect based on the {travel_style} style in {destination}.
+    1. `icon:fa-solid fa-map` **Trip Overview**: A brief, inspiring summary of what to expect based on the {travel_style} style in {destination}.
     
-    2. 🗓️ **Detailed Daily Itinerary**: For EACH day, break down the schedule thoroughly into beautifully written paragraphs:
+    2. `icon:fa-solid fa-calendar-days` **Detailed Daily Itinerary**: For EACH day, break down the schedule thoroughly into beautifully written paragraphs:
        - **Morning**, **Afternoon**, and **Evening**. 
        - Instead of just listing a name, describe the experience vividly. What will they see? What should they order? Why is it amazing? Include realistic timings.
        - Include the exact address and the Google Maps link on a new line right below the name of the place.
        *Important: Make sure the pacing is realistic and geographically logical.*
        
-    3. 🍜 **Culinary Guide**: Top local dishes to try and specific, highly-rated restaurants or street food stalls to find them in {destination}. Write descriptive paragraphs for each dish/restaurant. Include addresses and Google Maps links.
+    3. `icon:fa-solid fa-bowl-food` **Culinary Guide**: Top local dishes to try and specific, highly-rated restaurants or street food stalls to find them in {destination}. Write descriptive paragraphs for each dish/restaurant. Include addresses and Google Maps links.
     
-    4. 💡 **Essential Travel Tips**:
+    4. `icon:fa-solid fa-lightbulb` **Essential Travel Tips**:
        - Cultural etiquette & local customs
        - Best ways to get around (public transit, apps, etc.)
        - Safety tips and tourist traps to avoid
        
-    5. 💰 **Budget Breakdown**: A realistic breakdown of the {currency} {budget} covering Food, Transport, and Activities.
+    5. `icon:fa-solid fa-wallet` **Budget Breakdown**: A realistic breakdown of the {currency} {budget} covering Food, Transport, and Activities.
     
-    Tone: Professional, highly descriptive, inspiring, and incredibly knowledgeable. Use Markdown headers (##, ###), bold text for emphasis, and emojis to make it engaging and easy to read.
+    Tone: Professional, highly descriptive, inspiring, and incredibly knowledgeable. Use Markdown headers (##, ###), and bold text for emphasis.
+    CRITICAL: DO NOT use emojis anywhere in your response. Instead, whenever you want to use an icon, use inline code with the prefix "icon:" followed by a FontAwesome 6 Free class name. 
+    For example: instead of 📝, write `icon:fa-solid fa-clipboard-list`. Instead of 🍜, write `icon:fa-solid fa-bowl-food`. Instead of 🗓️, write `icon:fa-solid fa-calendar-days`. Use modern icons for activities (e.g. `icon:fa-solid fa-mountain`, `icon:fa-solid fa-utensils`, `icon:fa-solid fa-camera`, `icon:fa-solid fa-bed`).
     """
     
     try:
@@ -62,7 +64,11 @@ def generate_itinerary(destination: str, days: int, budget: float, travel_style:
                         }
                     ]
                 }
-            ]
+            ],
+            inferenceConfig={
+                "maxTokens": 8192,
+                "temperature": 0.7
+            }
         )
         
         # Extract the AI response

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Text, DateTime
+from sqlalchemy import Column, Integer, String, Float, Text, DateTime, ForeignKey
 from sqlalchemy.sql import func
 from database import Base
 
@@ -12,6 +12,9 @@ class Trip(Base):
     currency = Column(String, nullable=False, default="USD")
     category = Column(String, nullable=False)
     daily_budget = Column(Float, nullable=False)
+    
+    # Session 8: Ownership
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     
     # Session 5: store the AI-generated recommendation
     ai_recommendation = Column(Text, nullable=True)

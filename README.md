@@ -9,34 +9,50 @@ Kelana AI adalah platform berbasis Artificial Intelligence (AI) yang dirancang u
 * 🔍 Intelligent Search
 * ⚡ Fast & Responsive
 
-## Installation
+## Installation & Setup
 
-Clone repository:
+1. **Clone repository:**
+   ```bash
+   git clone <repository-url>
+   cd kelana-ai
+   ```
 
+2. **Backend Setup:**
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   
+   # Migrasi Database
+   python migrate_db.py
+   ```
+   *Catatan: Pastikan untuk menyesuaikan file `.env` di dalam folder backend sesuai dengan pengaturan database Anda.*
+
+3. **Frontend Setup:**
+   ```bash
+   cd ../frontend
+   npm install
+   ```
+   *Catatan: Pastikan untuk menyesuaikan file `.env` jika diperlukan.*
+
+## Run the Application
+
+Anda perlu menjalankan backend dan frontend secara bersamaan di dua terminal yang berbeda.
+
+**1. Jalankan Backend:**
+Buka terminal dan masuk ke folder `backend`, lalu jalankan:
 ```bash
-git clone <repository-url>
-cd kelana-ai
+cd backend
+uvicorn main:app --reload
 ```
+Server backend akan berjalan di `http://localhost:8000`.
 
-Install dependencies:
-
+**2. Jalankan Frontend:**
+Buka terminal baru dan masuk ke folder `frontend`, lalu jalankan:
 ```bash
-<install-command>
+cd frontend
+npm run dev
 ```
-
-Configure environment:
-
-```bash
-cp .env.example .env
-```
-
-Kemudian sesuaikan konfigurasi pada file `.env`.
-
-## Run
-
-```bash
-<run-command>
-```
+Website Kelana AI akan bisa diakses di `http://localhost:3000`.
 
 ## Project Status
 

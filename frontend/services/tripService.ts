@@ -1,6 +1,6 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
-function getAuthHeaders() {
+function getAuthHeaders(): Record<string, string> {
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('token');
     if (token) {

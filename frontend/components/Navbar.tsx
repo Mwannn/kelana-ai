@@ -64,9 +64,13 @@ export default function Navbar() {
               <a href="#planner" className="hover:text-[#E85D2F] transition-colors">Buat Trip</a>
               <a href="#experiences" className="hover:text-[#E85D2F] transition-colors">Pengalaman</a>
               <a href="#journal" className="hover:text-[#E85D2F] transition-colors">Jurnal</a>
-              <Link href="/assistant" className={`hover:text-[#E85D2F] transition-colors flex items-center gap-1.5 ${pathname === '/assistant' ? 'text-[#E85D2F] font-bold' : ''}`}>
+              <Link href="/assistant" className="hover:text-[#E85D2F] transition-colors flex items-center gap-1.5">
                 <i className="fa-solid fa-sparkles text-xs text-[#E85D2F]"></i>
                 <span>Assistant (RAG)</span>
+              </Link>
+              <Link href="/chat" className="hover:text-[#E85D2F] transition-colors flex items-center gap-1.5">
+                <i className="fa-regular fa-comments text-xs text-[#E85D2F]"></i>
+                <span>Chat AI</span>
               </Link>
             </>
           ) : (
@@ -75,6 +79,10 @@ export default function Navbar() {
               <Link href="/assistant" className={`hover:text-[#E85D2F] transition-colors flex items-center gap-1.5 ${pathname === '/assistant' ? 'text-[#E85D2F] font-bold' : ''}`}>
                 <i className="fa-solid fa-sparkles text-xs text-[#E85D2F]"></i>
                 <span>Travel Assistant</span>
+              </Link>
+              <Link href="/chat" className={`hover:text-[#E85D2F] transition-colors flex items-center gap-1.5 ${pathname === '/chat' ? 'text-[#E85D2F] font-bold' : ''}`}>
+                <i className="fa-regular fa-comments text-xs text-[#E85D2F]"></i>
+                <span>Chat AI</span>
               </Link>
               <Link href="/trips" className={`hover:text-[#E85D2F] transition-colors ${pathname === '/trips' ? 'text-[#E85D2F] font-bold' : ''}`}>My Trips</Link>
             </>
@@ -87,7 +95,7 @@ export default function Navbar() {
               <div className="hidden md:block text-sm font-medium text-[#1A1612]">
                 Welcome back, <Link href="/profile" className="font-bold text-[#E85D2F] hover:underline">{user.name}</Link> 👋
               </div>
-              <Link href="/assistant" className="sm:hidden text-sm font-medium hover:text-[#E85D2F] transition-colors">Assistant</Link>
+              <Link href="/chat" className="text-sm font-medium hover:text-[#E85D2F] transition-colors">Chat AI</Link>
               <Link href="/trips" className="text-sm font-medium hover:text-[#E85D2F] transition-colors">My Trips</Link>
               <button 
                 onClick={handleLogout}
@@ -99,9 +107,9 @@ export default function Navbar() {
           ) : (
             !loading && (
               <>
-                <Link href="/assistant" className="hidden sm:flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-full bg-[#E85D2F]/10 text-[#E85D2F] border border-[#E85D2F]/20 hover:bg-[#E85D2F] hover:text-white transition-all">
-                  <i className="fa-solid fa-sparkles"></i>
-                  <span>Tanya Assistant</span>
+                <Link href="/chat" className="hidden sm:flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-full bg-[#E85D2F]/10 text-[#E85D2F] border border-[#E85D2F]/20 hover:bg-[#E85D2F] hover:text-white transition-all">
+                  <i className="fa-regular fa-comments"></i>
+                  <span>Chat AI</span>
                 </Link>
                 <Link href="/login" className="hidden md:block text-sm font-medium">Masuk</Link>
                 <Link href="/#planner" className="btn-primary px-5 py-2.5 rounded-full text-sm font-semibold">

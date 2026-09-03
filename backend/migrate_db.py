@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, text
 from database import init_db
 import models.user # Ensure models are imported
 import models.trip
+import models.conversation
 
 # Load environment variables
 load_dotenv()

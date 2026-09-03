@@ -6,12 +6,14 @@ from typing import List
 from database import init_db, get_db
 from models.trip import Trip
 from models.user import User
+import models.conversation  # Session 10: Register Conversation and Message models
 from schemas.trip_schema import TripCreate, TripResponse, TripGenerateRequest
 from schemas.assistant_schema import QuestionRequest, QuestionResponse
 from services.trip_service import calculate_daily_budget, get_trip_category
 from services.bedrock_service import generate_itinerary
 from services.kb_service import ask_knowledge_base
 from api.v1.auth import router as auth_router
+from api.v1.conversations import router as conversations_router
 from api.deps import get_current_user
 
 app = FastAPI(title="KelanaAI API")
@@ -20,6 +22,7 @@ app = FastAPI(title="KelanaAI API")
 init_db()
 
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(conversations_router, prefix="/api/v1/conversations", tags=["conversations"])
 
 # Configure CORS for Next.js frontend (Session 6)
 app.add_middleware(

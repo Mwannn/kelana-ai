@@ -78,8 +78,10 @@ export default function ChatPage() {
           : data[0];
         selectConversation(target.id);
       } else {
-        // Automatically initialize the first conversation if none exists
-        handleCreateNewConversation("Percakapan Baru", false);
+        // Automatically initialize the first conversation if logged in
+        if (typeof window !== 'undefined' && localStorage.getItem('token')) {
+          handleCreateNewConversation("Percakapan Baru", false);
+        }
       }
     } catch (err: any) {
       console.warn("Failed to load conversations:", err);
@@ -108,6 +110,11 @@ export default function ChatPage() {
   };
 
   const handleCreateNewConversation = async (title?: string, autoSelect = true): Promise<Conversation | null> => {
+    if (typeof window !== 'undefined' && !localStorage.getItem('token')) {
+      setAuthError("Silakan masuk terlebih dahulu untuk membuat percakapan baru.");
+      return null;
+    }
+
     try {
       const created = await createConversation(title || "Percakapan Baru");
       setConversations(prev => [created, ...prev.filter(c => c.id !== created.id)]);
@@ -126,6 +133,11 @@ export default function ChatPage() {
   const handleSendMessage = async (textToSend?: string) => {
     const content = textToSend || inputMessage;
     if (!content.trim() || isAiTyping) return;
+
+    if (typeof window !== 'undefined' && !localStorage.getItem('token')) {
+      setAuthError("Silakan masuk terlebih dahulu untuk mengirim pesan dan menyimpan riwayat percakapan.");
+      return;
+    }
 
     let targetConv: Conversation | null = currentConversation;
 

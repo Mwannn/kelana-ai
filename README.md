@@ -17,6 +17,7 @@
   </p>
 
   <p align="center">
+    <a href="#-pratinjau-aplikasi">Pratinjau</a> •
     <a href="#-fitur-utama">Fitur Utama</a> •
     <a href="#-arsitektur--teknologi">Teknologi</a> •
     <a href="#-instalasi--menjalankan-aplikasi">Instalasi</a> •
@@ -24,6 +25,12 @@
     <a href="#-daftar-endpoint-api">API Endpoints</a> •
     <a href="#-pengembang--kontak">Pengembang</a>
   </p>
+
+  <br/>
+
+  <div align="center" id="-pratinjau-aplikasi">
+    <img src="frontend/public/image.png" alt="Kelana AI Application Interface" width="95%" style="border-radius: 16px; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.08);" />
+  </div>
 
 </div>
 
@@ -127,7 +134,8 @@ Kelana-ai/
 │   │   ├── chatService.ts           # Client API service untuk percakapan
 │   │   └── tripService.ts           # Client API service untuk trip & auth
 │   └── public/
-│       └── logo-kelanaai.png        # Aset visual & logo Kelana AI
+│       ├── logo-kelanaai.png        # Aset visual & logo Kelana AI
+│       └── image.png                # Tangkapan layar pratinjau antarmuka aplikasi
 │
 └── README.md                        # Dokumentasi repositori
 ```

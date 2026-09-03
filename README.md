@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="frontend/public/logo-kelanaai.png" alt="Kelana AI Logo" width="220" />
+  <img src="./frontend/public/logo-kelanaai.png" alt="Kelana AI Logo" width="220" />
 
   # 🧭 Kelana AI
   ### Intelligent Travel Planner & Multi-Turn Conversational Memory Assistant
@@ -26,13 +26,13 @@
     <a href="#-pengembang--kontak">Pengembang</a>
   </p>
 
-  <br/>
-
-  <div align="center" id="-pratinjau-aplikasi">
-    <img src="frontend/public/image.png" alt="Kelana AI Application Interface" width="95%" style="border-radius: 16px; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.08);" />
-  </div>
-
 </div>
+
+---
+
+## 📸 Pratinjau Aplikasi
+
+![Kelana AI Application Interface](./frontend/public/image.png)
 
 ---
 

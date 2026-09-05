@@ -76,6 +76,16 @@ export default function Home() {
     e.preventDefault();
     if (!destination || !budget || !days) return;
     
+    // Validasi login sebelum membuat itinerary
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) {
+      showToast('Wajib Masuk', 'Silakan daftar atau login terlebih dahulu untuk membuat rencana perjalanan.');
+      setTimeout(() => {
+        router.push('/login');
+      }, 1200);
+      return;
+    }
+
     setLoading(true);
     setTripData(null);
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import {
   getConversations,
@@ -24,21 +25,22 @@ const SUGGESTED_PROMPTS = [
   {
     category: "Kuliner",
     icon: "fa-solid fa-bowl-food",
-    text: "Rekomendasi wisata kuliner autentik & legendaris di Yogyakarta."
+    text: "Rekomendasi kuliner lokal halal dan hidden gem di Yogyakarta."
   },
   {
-    category: "Budget",
+    category: "Budgeting",
     icon: "fa-solid fa-wallet",
-    text: "Bantu buatkan estimasi budget & itinerary 3 hari santai di Bali."
+    text: "Bagaimana cara menyusun anggaran backpacking 7 hari di Labuan Bajo?"
   },
   {
-    category: "Petualangan",
-    icon: "fa-solid fa-person-hiking",
-    text: "Tips persiapan dan rekomendasi rute backpacking ke Labuan Bajo & Komodo."
+    category: "Packing",
+    icon: "fa-solid fa-suitcase-rolling",
+    text: "Daftar perlengkapan penting dan tips berkemas untuk trip mendaki Bromo."
   }
 ];
 
 export default function ChatPage() {
+  const router = useRouter();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -86,16 +88,18 @@ export default function ChatPage() {
   // Load user profile & conversations on mount
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (token) {
-      fetch(`${API_URL}/auth/me`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      .then(res => res.ok ? res.json() : null)
-      .then(userData => { if (userData) setCurrentUser(userData); })
-      .catch(err => console.warn("Failed to fetch user in chat:", err));
+    if (!token) {
+      router.push('/login');
+      return;
     }
+    fetch(`${API_URL}/auth/me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => res.ok ? res.json() : null)
+    .then(userData => { if (userData) setCurrentUser(userData); })
+    .catch(err => console.warn("Failed to fetch user in chat:", err));
     loadConversationList();
-  }, []);
+  }, [router]);
 
   const loadConversationList = async (selectId?: number) => {
     setLoadingConversations(true);

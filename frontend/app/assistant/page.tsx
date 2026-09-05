@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import { askAssistant, AssistantResponse } from '../../services/assistantService';
@@ -14,11 +15,19 @@ const SAMPLE_QUESTIONS = [
 ];
 
 export default function AssistantPage() {
+  const router = useRouter();
   const [question, setQuestion] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AssistantResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) {
+      router.push('/login');
+    }
+  }, [router]);
 
   const handleAsk = async (queryToAsk?: string) => {
     const q = queryToAsk || question;

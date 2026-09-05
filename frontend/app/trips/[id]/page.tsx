@@ -1,30 +1,33 @@
 'use client';
 
-import { useState, useEffect, use } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { getTrip } from "@/services/tripService";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import Footer from "@/components/Footer";
 
-export default function TripDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function TripDetailPage() {
   const router = useRouter();
-  const resolvedParams = use(params);
+  const routeParams = useParams();
+  const tripId = routeParams?.id as string;
   
   const [tripData, setTripData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    if (!tripId) return;
+
     const fetchTrip = async () => {
-      const token = localStorage.getItem('token');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       if (!token) {
         router.push('/login');
         return;
       }
 
       try {
-        const data = await getTrip(resolvedParams.id);
+        const data = await getTrip(tripId);
         setTripData(data);
       } catch (err: any) {
         console.error("Failed to fetch trip detail:", err);
@@ -40,7 +43,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
     };
 
     fetchTrip();
-  }, [resolvedParams.id, router]);
+  }, [tripId, router]);
 
   if (isLoading) {
     return (

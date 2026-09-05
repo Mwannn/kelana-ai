@@ -752,10 +752,10 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="pt-8 border-t border-[#F4EFE6]/10 text-sm flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="pt-8 border-t border-[#F4EFE6]/10 text-xs sm:text-sm flex flex-col md:flex-row justify-between items-center gap-4 text-[#F4EFE6]/70">
             <div>© 2026 Kelana AI Travel. Dibuat dengan rindu di Indonesia.</div>
             <div className="font-mono text-xs">
-              DESIGN BY <a href="https://marwan-wisnu.my.id/" target="_blank" rel="noopener noreferrer" className="hover:text-[#E85D2F] transition-colors underline decoration-[#F4EFE6]/30 hover:decoration-[#E85D2F]">mwannn_n</a>
+              Copyright © 2026 <a href="https://marwan-wisnu.my.id/" target="_blank" rel="noopener noreferrer" className="text-[#E85D2F] font-bold hover:text-white transition-colors underline decoration-[#E85D2F]/40 hover:decoration-white">Marwan Wisnu (mwannn_n)</a>. All rights reserved.
             </div>
           </div>
         </div>

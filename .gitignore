@@ -156,3 +156,7 @@ venv.bak/
 
 # KelanaAI specific ignores
 backend/.env
+frontend/.env
+frontend/.env.local
+*.env
+*.env.local

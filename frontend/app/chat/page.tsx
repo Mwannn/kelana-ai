@@ -13,6 +13,7 @@ import {
   Conversation,
   Message
 } from '../../services/chatService';
+import { API_URL } from '../../services/api';
 
 const SUGGESTED_PROMPTS = [
   {
@@ -86,7 +87,7 @@ export default function ChatPage() {
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (token) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/auth/me`, {
+      fetch(`${API_URL}/auth/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       .then(res => res.ok ? res.json() : null)

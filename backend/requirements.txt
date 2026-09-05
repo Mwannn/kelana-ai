@@ -1,8 +1,10 @@
 fastapi[all]
+uvicorn[standard]
 sqlalchemy
 psycopg2-binary
 python-dotenv
 boto3
+bcrypt
 passlib[bcrypt]
 python-jose
 python-multipart

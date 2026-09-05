@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getTrips, deleteTrip } from '@/services/tripService';
 import { getConversations, Conversation } from '@/services/chatService';
+import { API_URL } from '@/services/api';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -39,7 +40,7 @@ export default function ProfilePage() {
         return;
       }
       try {
-        const userRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/auth/me`, {
+        const userRes = await fetch(`${API_URL}/auth/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!userRes.ok) throw new Error('Failed to fetch user');
@@ -108,7 +109,7 @@ export default function ProfilePage() {
         payload.password = editPassword;
       }
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/auth/me`, {
+      const res = await fetch(`${API_URL}/auth/me`, {
         method: 'PUT',
         headers: { 
           'Authorization': `Bearer ${token}`,

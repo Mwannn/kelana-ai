@@ -7,7 +7,7 @@ export default function Cursor() {
   const ringPos = useRef({ x: 0, y: 0 });
   const cursorDotRef = useRef<HTMLDivElement>(null);
   const cursorRingRef = useRef<HTMLDivElement>(null);
-  const requestRef = useRef<number>();
+  const requestRef = useRef<number | null>(null);
 
   useEffect(() => {
     // Disable on small screens

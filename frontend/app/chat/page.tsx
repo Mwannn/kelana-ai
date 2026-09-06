@@ -76,13 +76,18 @@ export default function ChatPage() {
    * Scenario B: When new message is sent or AI response arrives
    */
   const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior
+      });
     }
   };
 
   useEffect(() => {
-    scrollToBottom('smooth');
+    if (messages.length > 0) {
+      scrollToBottom('smooth');
+    }
   }, [messages, isAiTyping]);
 
   // Load user profile & conversations on mount
@@ -135,8 +140,16 @@ export default function ChatPage() {
       setCurrentConversation(conv);
       setMessages(conv.messages || []);
       setSidebarOpen(false);
-      // UX Feature 2 Scenario A: Auto-scroll to bottom on opening
-      setTimeout(() => scrollToBottom('auto'), 60);
+      // UX Feature 2 Scenario A: Auto-scroll to bottom on opening only if messages exist, otherwise start at top
+      if (conv.messages && conv.messages.length > 0) {
+        setTimeout(() => scrollToBottom('auto'), 60);
+      } else {
+        setTimeout(() => {
+          if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = 0;
+          }
+        }, 60);
+      }
     } catch (err: any) {
       console.error("Failed to fetch conversation details:", err);
     } finally {
@@ -157,6 +170,11 @@ export default function ChatPage() {
         setCurrentConversation(created);
         setMessages([]);
         setSidebarOpen(false);
+        setTimeout(() => {
+          if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = 0;
+          }
+        }, 60);
       }
       return created;
     } catch (err: any) {
@@ -331,12 +349,12 @@ export default function ChatPage() {
   );
 
   return (
-    <main className="bg-[#F4EFE6] min-h-screen pt-20 pb-4 sm:pb-6 px-2 sm:px-4 lg:px-8 font-sans text-[#1A1612]">
-      <div className="max-w-[1400px] mx-auto h-[calc(100vh-6rem)] flex flex-col">
+    <main className="bg-[#F4EFE6] h-[100dvh] pt-16 sm:pt-20 pb-3 sm:pb-4 px-2 sm:px-4 lg:px-8 font-sans text-[#1A1612] flex flex-col overflow-hidden">
+      <div className="flex-1 min-h-0 w-full max-w-[1400px] mx-auto flex flex-col">
         
         {/* Auth Error Toast Banner */}
         {authError && (
-          <div className="bg-amber-50 border border-amber-200 text-amber-900 px-4 py-2.5 rounded-2xl mb-3 flex items-center justify-between text-xs sm:text-sm shadow-sm animate-fade-in">
+          <div className="bg-amber-50 border border-amber-200 text-amber-900 px-4 py-2.5 rounded-2xl mb-3 flex items-center justify-between text-xs sm:text-sm shadow-sm animate-fade-in shrink-0">
             <div className="flex items-center gap-2">
               <i className="fa-solid fa-circle-exclamation text-amber-600"></i>
               <span>{authError}</span>
@@ -351,7 +369,7 @@ export default function ChatPage() {
         )}
 
         {/* Master Chat Window Container */}
-        <div className="flex-1 bg-white border border-[#1A1612]/10 rounded-3xl shadow-[0_20px_50px_rgba(26,22,18,0.08)] overflow-hidden flex relative">
+        <div className="flex-1 min-h-0 bg-white border border-[#1A1612]/10 rounded-2xl sm:rounded-3xl shadow-[0_20px_50px_rgba(26,22,18,0.08)] overflow-hidden flex relative">
           
           {/* ============================================================ */}
           {/* SIDEBAR: Conversation List                                   */}
@@ -360,12 +378,12 @@ export default function ChatPage() {
             className={`
               absolute lg:static inset-y-0 left-0 z-30
               w-80 sm:w-84 bg-[#FDFCFA] border-r border-[#1A1612]/10
-              flex flex-col transition-transform duration-300 ease-in-out
+              flex flex-col transition-transform duration-300 ease-in-out h-full
               ${sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'}
             `}
           >
             {/* Sidebar Top Header with Kelana AI Logo */}
-            <div className="p-4 border-b border-[#1A1612]/5 flex items-center justify-between bg-white/50">
+            <div className="p-4 border-b border-[#1A1612]/5 flex items-center justify-between bg-white/50 shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="w-10 h-10 rounded-2xl bg-white border border-[#1A1612]/10 p-1.5 flex items-center justify-center shadow-xs">
                   <img src="/logo-kelanaai.png" alt="Kelana AI Logo" className="w-full h-full object-contain" />
@@ -389,7 +407,7 @@ export default function ChatPage() {
             </div>
 
             {/* New Conversation Button */}
-            <div className="p-3">
+            <div className="p-3 shrink-0">
               <button
                 onClick={() => handleCreateNewConversation("Percakapan Baru", true)}
                 className="w-full bg-gradient-to-r from-[#E85D2F] to-[#D4A24C] hover:opacity-95 text-white font-bold text-xs sm:text-sm py-3 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-[0_4px_15px_rgba(232,93,47,0.25)] hover:shadow-[0_6px_20px_rgba(232,93,47,0.35)] hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
@@ -400,7 +418,7 @@ export default function ChatPage() {
             </div>
 
             {/* Conversation Search Bar */}
-            <div className="px-3 pb-2">
+            <div className="px-3 pb-2 shrink-0">
               <div className="flex items-center gap-2 bg-[#F4EFE6]/70 px-3 py-1.5 rounded-xl border border-[#1A1612]/5 text-xs text-[#1A1612] focus-within:border-[#E85D2F] focus-within:bg-white transition-all">
                 <i className="fa-solid fa-magnifying-glass text-[#6B5D4F] text-[11px]"></i>
                 <input
@@ -419,7 +437,7 @@ export default function ChatPage() {
             </div>
 
             {/* Conversation List */}
-            <div className="flex-1 overflow-y-auto px-2 space-y-1 py-1">
+            <div className="flex-1 min-h-0 overflow-y-auto px-2 space-y-1 py-1 chat-scrollbar">
               {loadingConversations ? (
                 <div className="py-10 text-center text-xs text-[#6B5D4F] space-y-2">
                   <i className="fa-solid fa-circle-notch fa-spin text-xl text-[#E85D2F]"></i>
@@ -498,7 +516,7 @@ export default function ChatPage() {
             </div>
 
             {/* Sidebar Footer Badge */}
-            <div className="p-3 border-t border-[#1A1612]/5 bg-white/40 flex items-center justify-between text-[10px] text-[#6B5D4F]">
+            <div className="p-3 border-t border-[#1A1612]/5 bg-white/40 flex items-center justify-between text-[10px] text-[#6B5D4F] shrink-0">
               <span className="flex items-center gap-1 font-mono">
                 <i className="fa-solid fa-bolt text-[#D4A24C]"></i>
                 <span>Amazon Bedrock Nova</span>
@@ -520,12 +538,12 @@ export default function ChatPage() {
           {/* ============================================================ */}
           {/* MAIN CHAT VIEWPORT                                           */}
           {/* ============================================================ */}
-          <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#FAFAF8] relative">
+          <div className="flex-1 min-h-0 flex flex-col h-full overflow-hidden bg-[#FAFAF8] relative">
             
             {/* ---------------------------------------------------------- */}
             {/* UX Feature 1: Header with Conversation Title               */}
             {/* ---------------------------------------------------------- */}
-            <header className="px-4 sm:px-6 py-3 bg-white border-b border-[#1A1612]/10 flex items-center justify-between z-10 shadow-2xs">
+            <header className="px-4 sm:px-6 py-3 bg-white border-b border-[#1A1612]/10 flex items-center justify-between z-10 shadow-2xs shrink-0">
               <div className="flex items-center gap-3 min-w-0">
                 <button
                   onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -596,10 +614,10 @@ export default function ChatPage() {
             {/* ---------------------------------------------------------- */}
             <div 
               ref={chatContainerRef}
-              className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6"
+              className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-6 chat-scrollbar flex flex-col"
             >
               {loadingMessages ? (
-                <div className="h-full flex flex-col items-center justify-center text-center p-8 text-[#6B5D4F] space-y-3">
+                <div className="my-auto py-8 flex flex-col items-center justify-center text-center text-[#6B5D4F] space-y-3">
                   <div className="w-12 h-12 rounded-2xl bg-[#E85D2F]/10 text-[#E85D2F] flex items-center justify-center text-xl animate-bounce">
                     <i className="fa-solid fa-brain"></i>
                   </div>
@@ -607,30 +625,30 @@ export default function ChatPage() {
                   <p className="text-xs text-[#6B5D4F]">Menyusun memori giliran percakapan sebelumnya</p>
                 </div>
               ) : messages.length === 0 ? (
-                /* Hero Empty Chat State */
-                <div className="h-full flex flex-col items-center justify-center text-center px-4 py-6 max-w-2xl mx-auto">
-                  <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-[#E85D2F] to-[#D4A24C] text-white flex items-center justify-center text-2xl shadow-[0_10px_30px_rgba(232,93,47,0.3)] mb-4 animate-float">
+                /* Hero Empty Chat State with Safe Vertical Centering (no top clipping) */
+                <div className="my-auto py-4 sm:py-6 flex flex-col items-center justify-center text-center px-2 sm:px-4 max-w-2xl mx-auto w-full">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-gradient-to-tr from-[#E85D2F] to-[#D4A24C] text-white flex items-center justify-center text-xl sm:text-2xl shadow-[0_10px_30px_rgba(232,93,47,0.3)] mb-3 sm:mb-4 animate-float shrink-0">
                     <i className="fa-solid fa-compass"></i>
                   </div>
                   
-                  <h3 className="font-display font-bold text-2xl sm:text-3xl text-[#1A1612] mb-2 tracking-tight">
+                  <h3 className="font-display font-bold text-xl sm:text-3xl text-[#1A1612] mb-2 tracking-tight">
                     KelanaAI <span className="text-[#E85D2F]">Conversational Memory</span>
                   </h3>
                   
-                  <p className="text-xs sm:text-sm text-[#6B5D4F] mb-6 leading-relaxed max-w-lg">
+                  <p className="text-xs sm:text-sm text-[#6B5D4F] mb-4 sm:mb-6 leading-relaxed max-w-lg">
                     Tanyakan apa saja seputar rencanamu! KelanaAI mengingat konteks giliran sebelumnya sehingga pertanyaan lanjutan seperti <em>"Bagaimana dengan hari ke-2?"</em> dapat dijawab secara akurat.
                   </p>
 
-                  <div className="w-full space-y-2 text-left">
+                  <div className="w-full space-y-2 text-left mt-1">
                     <p className="text-[11px] font-bold text-[#6B5D4F] uppercase tracking-wider px-1">
                       💡 Coba Pertanyaan Contoh:
                     </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
                       {SUGGESTED_PROMPTS.map((prompt, idx) => (
                         <button
                           key={idx}
                           onClick={() => handleSendMessage(prompt.text)}
-                          className="group p-3 bg-white hover:bg-[#F4EFE6] border border-[#1A1612]/10 hover:border-[#E85D2F] rounded-2xl text-left transition-all shadow-2xs hover:shadow-xs hover:-translate-y-0.5 active:scale-98 cursor-pointer flex items-start gap-2.5"
+                          className="group p-2.5 sm:p-3 bg-white hover:bg-[#F4EFE6] border border-[#1A1612]/10 hover:border-[#E85D2F] rounded-2xl text-left transition-all shadow-2xs hover:shadow-xs hover:-translate-y-0.5 active:scale-98 cursor-pointer flex items-start gap-2.5"
                         >
                           <div className="w-7 h-7 rounded-xl bg-[#E85D2F]/10 group-hover:bg-[#E85D2F] group-hover:text-white text-[#E85D2F] flex items-center justify-center text-xs shrink-0 transition-colors">
                             <i className={prompt.icon}></i>
@@ -650,117 +668,119 @@ export default function ChatPage() {
                 </div>
               ) : (
                 /* Message Stream */
-                messages.map((msg, index) => {
-                  const isUser = msg.role === 'user';
-                  return (
-                    <div
-                      key={msg.id || index}
-                      className={`flex gap-3 max-w-3xl ${isUser ? 'ml-auto flex-row-reverse' : 'mr-auto'} group`}
-                    >
-                      {/* Avatar */}
-                      {isUser ? (
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-gradient-to-tr from-[#E85D2F] to-[#D4A24C] p-0.5 shadow-xs shrink-0 flex items-center justify-center overflow-hidden">
-                          <img 
-                            src={getEffectiveAvatar(currentUser)} 
-                            alt={currentUser?.name || "User"} 
-                            className="w-full h-full rounded-[14px] object-cover bg-[#F4EFE6]" 
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-white border border-[#1A1612]/10 p-1 shadow-xs shrink-0 flex items-center justify-center overflow-hidden">
-                          <img 
-                            src="/logo-kelanaai.png" 
-                            alt="Kelana AI" 
-                            className="w-full h-full object-contain" 
-                          />
-                        </div>
-                      )}
+                <div className="space-y-4 sm:space-y-6 w-full max-w-3xl mx-auto flex-1">
+                  {messages.map((msg, index) => {
+                    const isUser = msg.role === 'user';
+                    return (
+                      <div
+                        key={msg.id || index}
+                        className={`flex gap-3 max-w-3xl ${isUser ? 'ml-auto flex-row-reverse' : 'mr-auto'} group`}
+                      >
+                        {/* Avatar */}
+                        {isUser ? (
+                          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-gradient-to-tr from-[#E85D2F] to-[#D4A24C] p-0.5 shadow-xs shrink-0 flex items-center justify-center overflow-hidden">
+                            <img 
+                              src={getEffectiveAvatar(currentUser)} 
+                              alt={currentUser?.name || "User"} 
+                              className="w-full h-full rounded-[14px] object-cover bg-[#F4EFE6]" 
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-white border border-[#1A1612]/10 p-1 shadow-xs shrink-0 flex items-center justify-center overflow-hidden">
+                            <img 
+                              src="/logo-kelanaai.png" 
+                              alt="Kelana AI" 
+                              className="w-full h-full object-contain" 
+                            />
+                          </div>
+                        )}
 
-                      {/* Bubble with Content & UX Feature 4: Timestamp */}
-                      <div className="flex flex-col min-w-0 max-w-[85vw] sm:max-w-xl">
-                        <div
-                          className={`
-                            relative px-4 py-3 rounded-2xl text-xs sm:text-sm leading-relaxed
-                            ${isUser
-                              ? 'bg-gradient-to-br from-[#E85D2F] to-[#C8431C] text-white rounded-tr-none shadow-[0_4px_14px_rgba(232,93,47,0.2)]'
-                              : 'bg-white border border-[#1A1612]/10 text-[#1A1612] rounded-tl-none shadow-[0_4px_20px_rgba(26,22,18,0.04)]'
-                            }
-                          `}
-                        >
-                          {isUser ? (
-                            <p className="whitespace-pre-wrap font-medium">{msg.content}</p>
-                          ) : (
-                            <div>
-                              <div className="prose prose-sm max-w-none text-[#1A1612] prose-p:leading-relaxed prose-headings:font-display prose-headings:text-[#1A1612] prose-headings:mb-2 prose-headings:mt-3 prose-strong:text-[#1A1612] prose-ul:my-2 prose-li:my-0.5">
-                                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        {/* Bubble with Content & UX Feature 4: Timestamp */}
+                        <div className="flex flex-col min-w-0 max-w-[85vw] sm:max-w-xl">
+                          <div
+                            className={`
+                              relative px-4 py-3 rounded-2xl text-xs sm:text-sm leading-relaxed
+                              ${isUser
+                                ? 'bg-gradient-to-br from-[#E85D2F] to-[#C8431C] text-white rounded-tr-none shadow-[0_4px_14px_rgba(232,93,47,0.2)]'
+                                : 'bg-white border border-[#1A1612]/10 text-[#1A1612] rounded-tl-none shadow-[0_4px_20px_rgba(26,22,18,0.04)]'
+                              }
+                            `}
+                          >
+                            {isUser ? (
+                              <p className="whitespace-pre-wrap font-medium">{msg.content}</p>
+                            ) : (
+                              <div>
+                                <div className="prose prose-sm max-w-none text-[#1A1612] prose-p:leading-relaxed prose-headings:font-display prose-headings:text-[#1A1612] prose-headings:mb-2 prose-headings:mt-3 prose-strong:text-[#1A1612] prose-ul:my-2 prose-li:my-0.5">
+                                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                                </div>
+
+                                {/* Copy AI response button */}
+                                <div className="mt-2.5 pt-2 border-t border-[#1A1612]/5 flex items-center justify-end">
+                                  <button
+                                    onClick={() => copyToClipboard(msg.content, msg.id || index)}
+                                    className="text-[11px] text-[#6B5D4F] hover:text-[#E85D2F] flex items-center gap-1 transition-colors px-2 py-1 rounded-md hover:bg-[#F4EFE6]"
+                                    title="Salin jawaban"
+                                  >
+                                    <i className={`fa-solid ${copiedId === (msg.id || index) ? 'fa-check text-emerald-600' : 'fa-copy'}`}></i>
+                                    <span>{copiedId === (msg.id || index) ? 'Tersalin!' : 'Salin'}</span>
+                                  </button>
+                                </div>
                               </div>
+                            )}
+                          </div>
 
-                              {/* Copy AI response button */}
-                              <div className="mt-2.5 pt-2 border-t border-[#1A1612]/5 flex items-center justify-end">
-                                <button
-                                  onClick={() => copyToClipboard(msg.content, msg.id || index)}
-                                  className="text-[11px] text-[#6B5D4F] hover:text-[#E85D2F] flex items-center gap-1 transition-colors px-2 py-1 rounded-md hover:bg-[#F4EFE6]"
-                                  title="Salin jawaban"
-                                >
-                                  <i className={`fa-solid ${copiedId === (msg.id || index) ? 'fa-check text-emerald-600' : 'fa-copy'}`}></i>
-                                  <span>{copiedId === (msg.id || index) ? 'Tersalin!' : 'Salin'}</span>
-                                </button>
-                              </div>
-                            </div>
-                          )}
+                          {/* UX Feature 4: Timestamp for each message */}
+                          <span
+                            className={`
+                              text-[10px] mt-1 px-1.5 text-[#6B5D4F]/70 font-mono flex items-center gap-1
+                              ${isUser ? 'justify-end' : 'justify-start'}
+                            `}
+                          >
+                            <i className="fa-regular fa-clock text-[9px]"></i>
+                            <span>{formatTime(msg.created_at)}</span>
+                          </span>
                         </div>
+                      </div>
+                    );
+                  })}
 
-                        {/* UX Feature 4: Timestamp for each message */}
-                        <span
-                          className={`
-                            text-[10px] mt-1 px-1.5 text-[#6B5D4F]/70 font-mono flex items-center gap-1
-                            ${isUser ? 'justify-end' : 'justify-start'}
-                          `}
-                        >
-                          <i className="fa-regular fa-clock text-[9px]"></i>
-                          <span>{formatTime(msg.created_at)}</span>
-                        </span>
+                  {/* -------------------------------------------------------- */}
+                  {/* UX Feature 3: Typing Indicator                           */}
+                  {/* -------------------------------------------------------- */}
+                  {isAiTyping && (
+                    <div className="flex gap-3 max-w-xl mr-auto animate-fade-in">
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-white border border-[#1A1612]/10 p-1 shadow-xs shrink-0 flex items-center justify-center overflow-hidden">
+                        <img 
+                          src="/logo-kelanaai.png" 
+                          alt="Kelana AI" 
+                          className="w-full h-full object-contain" 
+                        />
+                      </div>
+                      <div className="bg-white border border-[#1A1612]/10 rounded-2xl rounded-tl-none px-4 py-3 shadow-[0_4px_16px_rgba(26,22,18,0.04)]">
+                        <div className="flex items-center gap-2.5">
+                          <div className="flex items-center gap-1">
+                            <span className="w-2 h-2 rounded-full bg-[#E85D2F] animate-bounce [animation-delay:-0.3s]"></span>
+                            <span className="w-2 h-2 rounded-full bg-[#E85D2F] animate-bounce [animation-delay:-0.15s]"></span>
+                            <span className="w-2 h-2 rounded-full bg-[#E85D2F] animate-bounce"></span>
+                          </div>
+                          <span className="text-xs text-[#6B5D4F] font-medium">
+                            KelanaAI sedang merangkai jawaban...
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  );
-                })
-              )}
-
-              {/* -------------------------------------------------------- */}
-              {/* UX Feature 3: Typing Indicator                           */}
-              {/* -------------------------------------------------------- */}
-              {isAiTyping && (
-                <div className="flex gap-3 max-w-xl mr-auto animate-fade-in">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-white border border-[#1A1612]/10 p-1 shadow-xs shrink-0 flex items-center justify-center overflow-hidden">
-                    <img 
-                      src="/logo-kelanaai.png" 
-                      alt="Kelana AI" 
-                      className="w-full h-full object-contain" 
-                    />
-                  </div>
-                  <div className="bg-white border border-[#1A1612]/10 rounded-2xl rounded-tl-none px-4 py-3 shadow-[0_4px_16px_rgba(26,22,18,0.04)]">
-                    <div className="flex items-center gap-2.5">
-                      <div className="flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-[#E85D2F] animate-bounce [animation-delay:-0.3s]"></span>
-                        <span className="w-2 h-2 rounded-full bg-[#E85D2F] animate-bounce [animation-delay:-0.15s]"></span>
-                        <span className="w-2 h-2 rounded-full bg-[#E85D2F] animate-bounce"></span>
-                      </div>
-                      <span className="text-xs text-[#6B5D4F] font-medium">
-                        KelanaAI sedang merangkai jawaban...
-                      </span>
-                    </div>
-                  </div>
+                  )}
                 </div>
               )}
 
               {/* UX Feature 2: Auto-scroll anchor */}
-              <div ref={messagesEndRef} className="h-2" />
+              <div ref={messagesEndRef} className="h-2 shrink-0" />
             </div>
 
             {/* ---------------------------------------------------------- */}
             {/* BOTTOM FLOATING INPUT CAPSULE                              */}
             {/* ---------------------------------------------------------- */}
-            <div className="p-3 sm:p-4 bg-white/90 backdrop-blur-md border-t border-[#1A1612]/10">
+            <div className="p-3 sm:p-4 bg-white/90 backdrop-blur-md border-t border-[#1A1612]/10 shrink-0">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();

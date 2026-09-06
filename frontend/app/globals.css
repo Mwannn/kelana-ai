@@ -37,6 +37,25 @@
   ::-webkit-scrollbar-track { background: var(--bg-warm); }
   ::-webkit-scrollbar-thumb { background: var(--fg); border-radius: 4px; }
 
+  /* Custom refined chat scrollbar */
+  .chat-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(26, 22, 18, 0.2) transparent;
+  }
+  .chat-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .chat-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .chat-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(26, 22, 18, 0.2);
+    border-radius: 9999px;
+  }
+  .chat-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+  }
+
   /* Grain texture overlay */
   body::before {
     content: '';

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Footer from '@/components/Footer';
 
 export default async function JournalDetail({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
@@ -28,43 +29,22 @@ export default async function JournalDetail({ params }: { params: Promise<{ slug
 
   return (
     <div className="bg-[#F4EFE6] min-h-screen text-[#1A1612] font-sans flex flex-col">
-      {/* Full Nav */}
-      <nav className="nav-glass fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <img src="/logo-kelanaai.png" alt="Kelana AI Logo" className="h-12 w-auto object-contain" />
-          </Link>
-          <div className="hidden lg:flex items-center gap-8 text-sm font-medium">
-            <Link href="/#destinations" className="hover:text-[#E85D2F] transition-colors">Destinasi</Link>
-            <Link href="/#planner" className="hover:text-[#E85D2F] transition-colors">Buat Trip</Link>
-            <Link href="/#experiences" className="hover:text-[#E85D2F] transition-colors">Pengalaman</Link>
-            <Link href="/#journal" className="hover:text-[#E85D2F] transition-colors">Jurnal</Link>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/masuk" className="hidden md:block text-sm font-medium cursor-hover-target">Masuk</Link>
-            <button className="btn-primary px-5 py-2.5 rounded-full text-sm font-semibold">
-              <span>Mulai Perjalanan</span>
-            </button>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero Image */}
-      <div className="w-full h-[50vh] md:h-[60vh] mt-16 relative">
+      <div className="w-full h-[45vh] sm:h-[50vh] md:h-[60vh] pt-14 relative">
         <img src={img} alt={title} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-black/30"></div>
       </div>
 
       {/* Content */}
-      <main className="max-w-[800px] mx-auto px-6 -mt-32 relative z-10">
-        <div className="bg-white rounded-3xl p-8 md:p-12 shadow-[0_30px_80px_-20px_rgba(26,22,18,0.15)]">
+      <main className="max-w-[800px] mx-auto px-4 sm:px-6 -mt-20 sm:-mt-32 relative z-10 mb-16">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 md:p-12 shadow-[0_30px_80px_-20px_rgba(26,22,18,0.15)] border border-[#1A1612]/5">
           <div className="flex items-center gap-2 mb-6 font-mono text-xs text-[#E85D2F] uppercase tracking-widest">
             <span>{location}</span>
             <span className="text-[#6B5D4F]">·</span>
             <span className="text-[#6B5D4F]">{readTime}</span>
           </div>
           
-          <h1 className="font-display font-black text-4xl md:text-5xl lg:text-6xl leading-tight mb-8">
+          <h1 className="font-display font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight mb-8">
             {title}
           </h1>
 
@@ -94,54 +74,7 @@ export default async function JournalDetail({ params }: { params: Promise<{ slug
         </div>
       </main>
 
-      <footer className="bg-[#1A1612] text-[#F4EFE6]/60 pt-16 pb-8 border-t border-[#F4EFE6]/10 mt-auto md:mt-24">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <img src="/logo-kelanaai.png" alt="Kelana AI Logo" className="h-16 w-auto object-contain brightness-0 invert opacity-90" />
-              </div>
-              <p className="text-sm">Perjalanan yang dirancang oleh orang yang pulang ke rumah.</p>
-            </div>
-            <div>
-              <div className="font-bold text-[#F4EFE6] mb-4">Eksplorasi</div>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/#destinations" className="hover:text-[#E85D2F] transition-colors">Destinasi</Link></li>
-                <li><Link href="/#planner" className="hover:text-[#E85D2F] transition-colors">Trip Planner AI</Link></li>
-                <li><Link href="/#experiences" className="hover:text-[#E85D2F] transition-colors">Pengalaman Lokal</Link></li>
-              </ul>
-            </div>
-            <div>
-              <div className="font-bold text-[#F4EFE6] mb-4">Tentang</div>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-[#E85D2F] transition-colors">Cerita Kami</a></li>
-                <li><a href="#" className="hover:text-[#E85D2F] transition-colors">Pemandu Lokal</a></li>
-                <li><Link href="/#journal" className="hover:text-[#E85D2F] transition-colors">Jurnal</Link></li>
-              </ul>
-            </div>
-            <div>
-              <div className="font-bold text-[#F4EFE6] mb-4">Sosial</div>
-              <div className="flex gap-3">
-                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors">
-                  <i className="fa-brands fa-instagram"></i>
-                </a>
-                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors">
-                  <i className="fa-brands fa-tiktok"></i>
-                </a>
-                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors">
-                  <i className="fa-brands fa-youtube"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="pt-8 border-t border-[#F4EFE6]/10 text-xs sm:text-sm flex flex-col md:flex-row justify-between items-center gap-4 text-[#F4EFE6]/70">
-            <div>© 2026 Kelana AI Travel. Dibuat dengan rindu di Indonesia.</div>
-            <div className="font-mono text-xs">
-              Copyright © 2026 <a href="https://marwan-wisnu.my.id/" target="_blank" rel="noopener noreferrer" className="text-[#E85D2F] font-bold hover:text-white transition-colors underline decoration-[#E85D2F]/40 hover:decoration-white">Marwan Wisnu (mwannn_n)</a>. All rights reserved.
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

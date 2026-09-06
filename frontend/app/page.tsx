@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { generateTrip } from '../services/tripService';
+import Footer from '@/components/Footer';
 
 export default function Home() {
   const [destination, setDestination] = useState('Jakarta Pusat Johar');
@@ -282,7 +283,7 @@ export default function Home() {
                     />
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                       <label className="font-mono text-xs uppercase tracking-widest text-[#6B5D4F] mb-1 block">Budget</label>
                       <div className="flex items-center gap-3">
@@ -552,7 +553,7 @@ export default function Home() {
               </div>
               <h3 className="font-display text-4xl lg:text-5xl font-bold mb-4 leading-tight">{activeTabData.title}</h3>
               <p className="text-[#6B5D4F] text-lg mb-8">{activeTabData.desc}</p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {activeTabData.stats.map((s: string, idx: number) => (
                   <div key={idx} className="flex items-center gap-3 bg-[#F4EFE6] rounded-2xl p-4">
                     <div className="w-8 h-8 rounded-full bg-[#E85D2F]/10 text-[#E85D2F] flex items-center justify-center">
@@ -685,21 +686,17 @@ export default function Home() {
           
           <form 
             onSubmit={(e) => { e.preventDefault(); showToast('Berlangganan berhasil', 'Email inspirasi bulanan akan segera tiba.'); }} 
-            className="flex max-w-md mx-auto gap-2 reveal"
+            className="flex flex-col sm:flex-row max-w-md mx-auto gap-2 reveal"
           >
             <input 
               type="email" 
               placeholder="email@anda.com" 
               required
-              className="flex-1 bg-transparent border border-[#F4EFE6]/30 rounded-full px-6 py-4 outline-none focus:border-[#E85D2F] transition-colors placeholder-[#F4EFE6]/40" 
-               
-              
+              className="flex-1 bg-transparent border border-[#F4EFE6]/30 rounded-full px-6 py-3.5 sm:py-4 outline-none focus:border-[#E85D2F] transition-colors placeholder-[#F4EFE6]/40 text-center sm:text-left" 
             />
             <button 
               type="submit" 
-              className="bg-[#E85D2F] hover:bg-[#C8431C] text-white px-8 py-4 rounded-full font-semibold transition-colors"
-               
-              
+              className="bg-[#E85D2F] hover:bg-[#C8431C] text-white px-8 py-3.5 sm:py-4 rounded-full font-semibold transition-colors w-full sm:w-auto"
             >
               Berlangganan
             </button>
@@ -710,56 +707,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#1A1612] text-[#F4EFE6]/60 pt-16 pb-8 border-t border-[#F4EFE6]/10">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <img src="/logo-kelanaai.png" alt="Kelana AI Logo" className="h-16 w-auto object-contain brightness-0 invert opacity-90" />
-              </div>
-              <p className="text-sm">Perjalanan yang dirancang oleh orang yang pulang ke rumah.</p>
-            </div>
-            <div>
-              <h4 className="text-[#F4EFE6] font-semibold mb-4 text-sm">Destinasi</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-[#E85D2F]"  >Bali</a></li>
-                <li><a href="#" className="hover:text-[#E85D2F]"  >Labuan Bajo</a></li>
-                <li><a href="#" className="hover:text-[#E85D2F]"  >Raja Ampat</a></li>
-                <li><a href="#" className="hover:text-[#E85D2F]"  >Bromo</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-[#F4EFE6] font-semibold mb-4 text-sm">Perusahaan</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-[#E85D2F]"  >Tentang kami</a></li>
-                <li><a href="#" className="hover:text-[#E85D2F]"  >Karir</a></li>
-                <li><a href="#" className="hover:text-[#E85D2F]"  >Blog</a></li>
-                <li><a href="#" className="hover:text-[#E85D2F]"  >Kontak</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-[#F4EFE6] font-semibold mb-4 text-sm">Ikuti</h4>
-              <div className="flex gap-3">
-                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors"  >
-                  <i className="fa-brands fa-instagram"></i>
-                </a>
-                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors"  >
-                  <i className="fa-brands fa-tiktok"></i>
-                </a>
-                <a href="#" className="w-10 h-10 rounded-full border border-[#F4EFE6]/20 flex items-center justify-center hover:bg-[#E85D2F] hover:border-[#E85D2F] transition-colors"  >
-                  <i className="fa-brands fa-youtube"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="pt-8 border-t border-[#F4EFE6]/10 text-xs sm:text-sm flex flex-col md:flex-row justify-between items-center gap-4 text-[#F4EFE6]/70">
-            <div>© 2026 Kelana AI Travel. Dibuat dengan rindu di Indonesia.</div>
-            <div className="font-mono text-xs">
-              Copyright © 2026 <a href="https://marwan-wisnu.my.id/" target="_blank" rel="noopener noreferrer" className="text-[#E85D2F] font-bold hover:text-white transition-colors underline decoration-[#E85D2F]/40 hover:decoration-white">Marwan Wisnu (mwannn_n)</a>. All rights reserved.
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       {/* Toast Notification */}
       <div 

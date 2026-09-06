@@ -98,9 +98,10 @@
   .hero-title {
     font-family: 'Fraunces', serif;
     font-weight: 900;
-    font-size: clamp(3.5rem, 12vw, 11rem);
-    line-height: 0.85;
+    font-size: clamp(2.5rem, 10vw, 11rem);
+    line-height: 0.88;
     letter-spacing: -0.04em;
+    word-break: break-word;
   }
 
   .hero-title em {
@@ -309,9 +310,10 @@
   .editorial-title {
     font-family: 'Fraunces', serif;
     font-weight: 900;
-    font-size: clamp(3rem, 8vw, 7rem);
-    line-height: 0.9;
+    font-size: clamp(2.25rem, 7vw, 7rem);
+    line-height: 0.95;
     letter-spacing: -0.03em;
+    word-break: break-word;
   }
 
   .editorial-title em {

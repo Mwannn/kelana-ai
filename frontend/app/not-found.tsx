@@ -175,7 +175,7 @@ export default function NotFound() {
       {/* Footer Mini */}
       <footer className="bg-[#1A1612] text-[#F4EFE6]/60 py-6 border-t border-[#F4EFE6]/10">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
-          <div>© 2024 Kelana AI. Tersesat sementara, perjalanan belum berakhir.</div>
+          <div>© 2026 Kelana AI. Tersesat sementara, perjalanan belum berakhir.</div>
           <div className="font-mono text-xs">ERROR CODE: 404 - LOST_TRAVELER</div>
         </div>
       </footer>

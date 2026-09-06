@@ -67,15 +67,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/careers" className="hover:text-[#E85D2F] transition-colors inline-flex items-center gap-2">
-                  <i className="fa-solid fa-briefcase text-[10px] text-[#E85D2F]"></i>
-                  <span>Karir</span>
-                  <span className="bg-[#E85D2F]/20 text-[#E85D2F] text-[9px] px-1.5 py-0.5 rounded font-bold font-mono">
-                    Hiring
-                  </span>
-                </Link>
-              </li>
-              <li>
                 <Link href="/blog" className="hover:text-[#E85D2F] transition-colors inline-flex items-center gap-1.5">
                   <i className="fa-solid fa-book-open text-[10px] text-[#E85D2F]"></i>
                   <span>Blog & Jurnal</span>

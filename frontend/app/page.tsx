@@ -27,7 +27,7 @@ export default function Home() {
       quote: "Kami percaya pariwisata terbaik adalah yang menguntungkan penduduk lokal, bukan rantai hotel internasional.",
       name: "Marwan Wisnu",
       role: "FOUNDER, KELANA AI",
-      img: "https://ui-avatars.com/api/?name=Marwan+Wisnu&background=E85D2F&color=F4EFE6&size=100&bold=true"
+      img: "/icon-192x192.png"
     },
     {
       quote: "Itinerary dari AI ini sangat detail! Kami menemukan kedai kopi tersembunyi yang bahkan turis lain tidak tahu.",

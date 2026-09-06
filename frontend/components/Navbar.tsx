@@ -34,8 +34,9 @@ export default function Navbar() {
           localStorage.removeItem('token');
           setUser(null);
         }
-      } catch (err) {
-        console.error('Failed to fetch user', err);
+      } catch {
+        // Backend might be offline or sleeping; fail gracefully without throwing error overlay
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -54,7 +55,7 @@ export default function Navbar() {
     { label: 'Beranda', href: '/', isActive: pathname === '/' },
     { label: 'Destinasi', href: '/#destinations', isActive: false },
     { label: 'Buat Trip', href: '/#planner', isActive: false },
-    { label: 'Blog', href: '/blog', isActive: pathname === '/blog' || pathname.startsWith('/journal') },
+    { label: 'Blog', href: '/blog', isActive: pathname.startsWith('/blog') || pathname.startsWith('/journal') },
     { label: 'Assistant', href: '/assistant', icon: 'fa-solid fa-sparkles', isActive: pathname === '/assistant' },
     { label: 'Chat AI', href: '/chat', icon: 'fa-regular fa-comments', isActive: pathname === '/chat', badge: 'Memory' },
     { label: 'My Trips', href: '/trips', isActive: pathname === '/trips' },
@@ -254,21 +255,6 @@ export default function Navbar() {
             >
               <i className="fa-solid fa-leaf text-xs text-[#E85D2F]"></i>
               <span>Tentang Kami</span>
-            </Link>
-            <Link
-              href="/careers"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                pathname === '/careers' ? 'bg-[#E85D2F] text-white' : 'text-[#6B5D4F] hover:bg-[#F4EFE6] hover:text-[#1A1612]'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <i className="fa-solid fa-briefcase text-xs text-[#E85D2F]"></i>
-                <span>Karir</span>
-              </div>
-              <span className="bg-[#E85D2F]/15 text-[#E85D2F] text-[9px] px-1.5 py-0.5 rounded font-bold font-mono">
-                Hiring
-              </span>
             </Link>
             <Link
               href="/contact"

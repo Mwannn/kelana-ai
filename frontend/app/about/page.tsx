@@ -1,9 +1,54 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Footer from '@/components/Footer';
 
 export default function AboutPage() {
+  const founderQuotes = [
+    {
+      quote: "Kami percaya pariwisata terbaik adalah yang menguntungkan penduduk lokal dan memperkaya batin pejalan, bukan sekadar transaksi ekonomi tanpa memori.",
+      context: "Filosofi Pemberdayaan Komunitas"
+    },
+    {
+      quote: "Setiap sudut Nusantara memiliki cerita yang tak tertulis di buku panduan—hanya tersimpan di senyum tetua desa dan aroma kopi tubruk fajar hari.",
+      context: "Jiwa Autentik Nusantara"
+    },
+    {
+      quote: "Bukan seberapa jauh kita melangkah, melainkan seberapa dalam kita memahami tanah yang kita pijak dan menghargai adat yang menyambut kita.",
+      context: "Etika & Rasa Hormat Penjelajah"
+    },
+    {
+      quote: "Teknologi AI terbaik bukanlah yang menggantikan interaksi manusia, melainkan yang menuntun langkah kita ke perjumpaan paling bermakna di pelosok negeri.",
+      context: "Kecerdasan Buatan Humanis"
+    },
+    {
+      quote: "Perjalanan sejati adalah saat kita pulang ke rumah dengan cara pandang baru, meninggalkan jejak kebaikan dan membawa pulang memori yang abadi.",
+      context: "Makna Pulang ke Rumah"
+    },
+    {
+      quote: "Di balik setiap bukit savana Flores dan kabut mistis Bromo, ada jiwa Indonesia yang selalu ramah memanggil para penjelajah untuk pulang.",
+      context: "Panggilan Ibu Pertiwi"
+    },
+    {
+      quote: "Wisata berkelanjutan bukan sekadar tren; ini adalah janji suci kita menjaga laut Raja Ampat tetap biru dan hutan adat tetap lestari bagi generasi mendatang.",
+      context: "Pelestarian Ekosistem"
+    },
+    {
+      quote: "Jangan hanya menjadi turis yang numpang lewat—jadilah pejalan yang duduk, mendengar, dan menghidupkan denyut ekonomi warung-warung kecil Nusantara.",
+      context: "Dukungan Nyata untuk UMKM"
+    }
+  ];
+
+  const [currentQuoteIdx, setCurrentQuoteIdx] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentQuoteIdx((prev) => (prev + 1) % founderQuotes.length);
+    }, 5500);
+    return () => clearInterval(timer);
+  }, [founderQuotes.length]);
+
   const pillars = [
     {
       icon: 'fa-solid fa-compass',
@@ -124,11 +169,11 @@ export default function AboutPage() {
               <div className="md:col-span-4 text-center md:text-left">
                 <div className="relative inline-block">
                   <img
-                    src="https://ui-avatars.com/api/?name=Marwan+Wisnu&background=E85D2F&color=F4EFE6&size=200&bold=true"
+                    src="/icon-192x192.png"
                     alt="Marwan Wisnu"
-                    className="w-24 h-24 sm:w-36 sm:h-36 rounded-2xl object-cover border-2 border-[#F4EFE6]/20 shadow-xl mx-auto md:mx-0"
+                    className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl object-cover border-2 border-[#E85D2F]/50 shadow-2xl mx-auto md:mx-0 transition-transform hover:scale-105"
                   />
-                  <span className="absolute -bottom-2 -right-2 bg-[#E85D2F] text-white text-[10px] font-mono px-2 py-0.5 rounded-full font-bold">
+                  <span className="absolute -bottom-2 -right-2 bg-[#E85D2F] text-white text-[10px] font-mono px-2 py-0.5 rounded-full font-bold shadow-md">
                     FOUNDER
                   </span>
                 </div>
@@ -148,13 +193,64 @@ export default function AboutPage() {
               </div>
 
               <div className="md:col-span-8 border-t md:border-t-0 md:border-l border-[#F4EFE6]/15 pt-6 md:pt-0 md:pl-10">
-                <i className="fa-solid fa-quote-left text-3xl text-[#E85D2F] mb-4 block opacity-80"></i>
-                <blockquote className="font-display text-lg sm:text-2xl leading-relaxed text-[#F4EFE6] italic mb-6">
-                  "Kami percaya pariwisata terbaik adalah yang menguntungkan penduduk lokal dan memperkaya batin pejalan, bukan sekadar transaksi ekonomi tanpa memori."
-                </blockquote>
-                <p className="text-xs sm:text-sm text-[#F4EFE6]/70 leading-relaxed">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <i className="fa-solid fa-quote-left text-3xl text-[#E85D2F] block opacity-90"></i>
+                  <span className="text-[10px] sm:text-xs font-mono text-[#E85D2F] uppercase tracking-wider bg-[#E85D2F]/15 px-3 py-1 rounded-full border border-[#E85D2F]/30 font-semibold">
+                    {founderQuotes[currentQuoteIdx].context}
+                  </span>
+                </div>
+
+                {/* Animated Rotating Quote */}
+                <div className="min-h-[130px] sm:min-h-[110px] flex flex-col justify-center">
+                  <blockquote
+                    key={currentQuoteIdx}
+                    className="font-display text-lg sm:text-2xl leading-relaxed text-[#F4EFE6] italic mb-4 animate-fade-in transition-all"
+                  >
+                    "{founderQuotes[currentQuoteIdx].quote}"
+                  </blockquote>
+                </div>
+
+                <p className="text-xs sm:text-sm text-[#F4EFE6]/70 leading-relaxed mb-6">
                   Kelana AI dirancang dengan kecintaan mendalam pada tanah air Indonesia, memadukan kecerdasan komputasi modern dengan sentuhan jiwa humanis khas Nusantara.
                 </p>
+
+                {/* Quote Indicator Navigation Dots & Controls */}
+                <div className="flex items-center justify-between pt-3 border-t border-[#F4EFE6]/10">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {founderQuotes.map((_, qIdx) => (
+                      <button
+                        key={qIdx}
+                        onClick={() => setCurrentQuoteIdx(qIdx)}
+                        className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                          currentQuoteIdx === qIdx
+                            ? 'w-6 bg-[#E85D2F]'
+                            : 'w-1.5 bg-[#F4EFE6]/20 hover:bg-[#F4EFE6]/60'
+                        }`}
+                        title={`Kutipan ${qIdx + 1}: ${founderQuotes[qIdx].context}`}
+                      />
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono text-[#F4EFE6]/50">
+                      {String(currentQuoteIdx + 1).padStart(2, '0')} / {String(founderQuotes.length).padStart(2, '0')}
+                    </span>
+                    <button
+                      onClick={() => setCurrentQuoteIdx((prev) => (prev - 1 + founderQuotes.length) % founderQuotes.length)}
+                      className="w-6 h-6 rounded-full bg-white/10 hover:bg-[#E85D2F] text-white flex items-center justify-center text-[10px] transition-colors cursor-pointer"
+                      title="Kutipan Sebelumnya"
+                    >
+                      <i className="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button
+                      onClick={() => setCurrentQuoteIdx((prev) => (prev + 1) % founderQuotes.length)}
+                      className="w-6 h-6 rounded-full bg-white/10 hover:bg-[#E85D2F] text-white flex items-center justify-center text-[10px] transition-colors cursor-pointer"
+                      title="Kutipan Berikutnya"
+                    >
+                      <i className="fa-solid fa-chevron-right"></i>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 

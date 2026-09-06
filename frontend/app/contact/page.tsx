@@ -13,48 +13,59 @@ export default function ContactPage() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage('');
 
-    // Simulate sending message
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-      setFormData({
-        name: '',
-        email: '',
-        subject: 'Pertanyaan Umum',
-        message: ''
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
-    }, 800);
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setSubmitted(true);
+        setFormData({
+          name: '',
+          email: '',
+          subject: 'Pertanyaan Umum',
+          message: ''
+        });
+      } else {
+        setErrorMessage(data.error || 'Terjadi kesalahan saat mengirim pesan. Silakan coba kembali.');
+      }
+    } catch (err: any) {
+      console.error('Error sending contact form:', err);
+      setErrorMessage('Koneksi gagal. Silakan periksa jaringan Anda atau hubungi kami langsung via WhatsApp.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const contactChannels = [
     {
       icon: 'fa-regular fa-envelope',
       title: 'Kirim Email',
-      value: 'halo@kelana-ai.com',
+      value: 'merintisdigital@gmail.com',
       subtext: 'Balasan biasanya dalam waktu 1x24 jam',
       actionText: 'Kirim Email',
-      href: 'mailto:halo@kelana-ai.com'
+      href: 'mailto:merintisdigital@gmail.com'
     },
     {
       icon: 'fa-brands fa-whatsapp',
-      title: 'WhatsApp Concierge',
-      value: '+62 812-3456-7890',
-      subtext: 'Senin - Jumat, 09:00 - 18:00 WIB',
+      title: 'WhatsApp & Telepon',
+      value: '+62 898-4903-127',
+      subtext: 'Respon cepat untuk pertanyaan & kolaborasi',
       actionText: 'Chat WhatsApp',
-      href: 'https://wa.me/6281234567890'
-    },
-    {
-      icon: 'fa-solid fa-location-dot',
-      title: 'Studio Kreatif',
-      value: 'Jakarta Pusat & Bali',
-      subtext: 'Indonesia',
-      actionText: 'Buka Peta',
-      href: 'https://maps.google.com'
+      href: 'https://wa.me/628984903127'
     }
   ];
 
@@ -240,6 +251,13 @@ export default function ContactPage() {
                           className="w-full px-4 py-3 bg-[#F4EFE6] border border-transparent rounded-xl focus:outline-none focus:border-[#E85D2F] text-sm transition-colors resize-none"
                         ></textarea>
                       </div>
+
+                      {errorMessage && (
+                        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium flex items-center gap-2">
+                          <i className="fa-solid fa-circle-exclamation flex-shrink-0"></i>
+                          <span>{errorMessage}</span>
+                        </div>
+                      )}
 
                       <button
                         type="submit"
